@@ -1,0 +1,8 @@
+{
+    "author": "Mateus e Luis",
+    "title": "O que eu quiser",
+    "description": "o que eu descrever",
+    "max_turns": 10,
+    "life": 10,
+    "attack": 10
+}

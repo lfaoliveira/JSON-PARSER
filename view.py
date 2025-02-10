@@ -6,14 +6,27 @@ class Printer:
         self.title = data["title"]
         self.desc = data["description"]
 
-        tab = "   "
-        str = tab + "#"*30
-        print(str, "\n")
-        str = tab + f"Titulo: {self.title}\n\n"
+        self.tab = "   "
+        self.leading = "# "
+        self.trail = " #"
+        max_width = 100
+        str = "#"*30
         print(str)
-        str = tab + f"Descrição: {self.desc}"
-        print(str)
-        str = f"{tab}Autor: {self.author}              Criado por Mateus e Luis"
+
+        str = f"Titulo: {self.title}"
+        self.ligar_str(self.tab, self.leading, str, self.trail, nl="\n\n")
+        self.ligar_str(tab=self.tab, conteudo="#")
+        self.ligar_str(tab=self.tab, conteudo="#")
+
+        str = f"Descrição: {self.desc}"
+
+        self.ligar_str(self.tab, self.leading, str, self.trail)
+
+        str = f"Criado por: {self.author}"
+        self.ligar_str(self.tab, self.leading, str, self.trail)
+
+    def ligar_str(self, tab="", leading="", conteudo="", trail="", nl=""):
+        str = f"{tab}{leading}{conteudo}{trail}{nl}"
         print(str)
 
     def print_dialogo(self):
