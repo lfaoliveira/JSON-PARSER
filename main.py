@@ -1,24 +1,19 @@
 import os
 import json
-from view import Printer
+from view import View
 from model import DataManipulator
 from controller import Controller
+from transitions import Machine
 
 
-def pegar_JSON(path_dataset, filename):
-    path_json = os.path.join(path_dataset, filename)
-    with open(path_json, "r") as file:
-        data = json.load(file)
-        # dados retornados como dict
-        return data
-
+# lista em que se bota atributos do sistema
+LISTA_ATR_SIST = ["author", "title", "description", "max_turns"]
 
 # main
 if __name__ == "__main__":
     # pegando JSON
     path_dataset = os.getcwd()
     filename = "exemplo.json"
-    data = pegar_JSON(path_dataset, filename)
-    print(f"JSON: {data}\n\n")
-    printer = Printer(data)
-    model = DataManipulator(data)
+    # modelo pega todos os atributos do JSON
+    model = DataManipulator(path_dataset, filename)
+    printer = View(model.get_data)

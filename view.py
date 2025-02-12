@@ -1,14 +1,15 @@
 # import
 
-class Printer:
+class View:
     def __init__(self, data):
         self.author = data["author"]
         self.title = data["title"]
         self.desc = data["description"]
-
         self.tab = "   "
         self.leading = "# "
         self.trail = " #"
+
+    def print_inicial(self):
         max_width = 100
         str = "#"*30
         print(str)
