@@ -3,7 +3,6 @@ import json
 from view import View
 from model import DataManipulator
 from controller import Controller
-from transitions import Machine
 
 
 # lista em que se bota atributos do sistema
