@@ -5,12 +5,26 @@ from os import system
 from os.path import exists
 from click import getchar
 from transitions import Machine
+from transitions import Transition
 
 # inspiracao: https://github.com/acm-0/AdventureGame
 
 estados = ['inicial', 'movendo', 'pegando',
-           'largando', 'atacando', 'parado', 'interagindo',
-           'dialogando', 'perdendoVida']
+           'largando', 'atacando', 'esperando', 'interagindo',
+           'dialogando', 'perdendoVida', 'executando', 'andando', 'defendendo']
+
+transitions = [
+    {'trigger': 'iniciarJogo', 'source': 'inicial',
+        'dest': 'esperando'},  # iniciarJogo
+    {'trigger': 'mover', 'source': 'esperando',
+        'dest': 'movendo', 'kwargs': ["direcao", "id_local"]},  # mover
+    {'trigger': 'interagir', 'source': 'esperando',
+        'dest': 'interagindo', 'kwargs': ["id_item"]},  # interagir
+    {'trigger': 'atacar', 'source': 'esperando',
+        'dest': 'atacando', 'kwargs': ["id_enemy"]},  # atacar
+    {'trigger': '', 'source': '', 'dest': ''}
+
+]
 
 
 class Controller:
@@ -25,18 +39,19 @@ class Controller:
 
         # transicao de mover
         self.machine.add_transition(
-            trigger='mover', source='parado', dest='movendo', kwargs=["direcao", "local"])
+            trigger='', source='', dest='', )
 
         # transicao para interagir
         self.machine.add_transition(
-            trigger='interagir', source='parado', dest='interagindo', kwargs=["id_item"])
+            trigger='', source='', dest='', )
 
         #
-        self.machine.add_transition('', '', '')
+        self.machine.add_transition(
+            trigger='', source='', dest='', kwargs=["id_item"])
 
         #
         self.machine.add_transition('', '*', '',
                                     before='')
 
-    def get_data_from_model():
+    def mover(direcao, id_local):
         pass
