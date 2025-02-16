@@ -2,12 +2,20 @@
 
 class View:
     def __init__(self, data):
+        # dados
         self.author = data["author"]
         self.title = data["title"]
         self.desc = data["description"]
-        self.tab = "   "
+        self.startLocationId = data["startLocationId"]
+        self.attack = data["attack"]
+        self.defense = data["defense"]
+        self.life = data["life"]
+        # variaveis de texto
+        self.tab = " "*3
         self.leading = "# "
         self.trail = " #"
+
+        self.print_inicial()
 
     def print_inicial(self):
         max_width = 100

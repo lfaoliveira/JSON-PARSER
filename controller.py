@@ -9,9 +9,9 @@ from transitions import Transition
 
 # inspiracao: https://github.com/acm-0/AdventureGame
 
-estados = ['inicial', 'movendo', 'pegando',
-           'largando', 'atacando', 'esperando', 'interagindo',
-           'dialogando', 'perdendoVida', 'executando', 'andando', 'defendendo']
+estados = ['inicial', 'esperando', 'movendo', 'pegando',
+           'largando', 'atacando', 'interagindo',
+           'dialogando', 'executando', 'andando', 'defendendo']
 
 transitions = [
     {'trigger': 'iniciarJogo', 'source': 'inicial',
@@ -23,7 +23,6 @@ transitions = [
     {'trigger': 'atacar', 'source': 'esperando',
         'dest': 'atacando', 'kwargs': ["id_enemy"]},  # atacar
     {'trigger': '', 'source': '', 'dest': ''}
-
 ]
 
 

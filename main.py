@@ -4,10 +4,6 @@ from view import View
 from model import DataManipulator
 from controller import Controller
 
-
-# lista em que se bota atributos do sistema
-LISTA_ATR_SIST = ["author", "title", "description", "max_turns"]
-
 # main
 if __name__ == "__main__":
     # pegando JSON

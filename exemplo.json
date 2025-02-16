@@ -1,8 +1,81 @@
 {
-    "author": "Mateus e Luis",
-    "title": "O que eu quiser",
-    "description": "o que eu descrever",
-    "max_turns": 10,
-    "life": 10,
-    "attack": 10
-}
+"title": "",
+"description": "",
+"author": "",
+"startLocationId": "",
+"max_itens" : "",
+"max_turns_easy" : "",
+"max_turns_normal" : "",
+"max_turns_hard" : "",
+"attack" : 10,
+"defense" : 8,
+"life" : 22,
+"locations": [
+    {
+    "id": "",
+    "name": "",
+    "description": "",
+    "exits": [
+        {
+        "direction": "",
+        "targetLocationId": "",
+        "description": "",
+        "inactive": true
+        }
+    ],
+    "items": [
+        {"id": "",
+        "name": "",
+        "description": "",
+        "can_take": false,
+        "inactive": false
+        }],
+    "npcs": [
+        {
+        "id": "",
+        "name": "",
+        "description": "",
+        "inactive": true,
+        "dialogues": [
+            {
+            "text": "",
+                "responses": [ 
+                {
+                    "result": {
+                        "active": [],
+                        "lose_item": []
+                    }
+                }
+                ]
+            }
+        ]
+    }],
+    "puzzles": [
+        {
+            "id": "",
+            "description": "",
+            "solution": {
+                "requiredItems": [],
+                "actions": ""
+            },
+            "result": {
+                "active": [],
+                "lose_item": [],
+                "lose_life": 12
+            }
+        }
+    ],
+    "enemies": [
+        {
+            "attack": 12,
+            "defense": 7,
+            "result": {
+                "active": [],
+                "lose_item": [],
+                "lose_life": 12
+            }
+        }
+    ]
+    }
+]
+} 
