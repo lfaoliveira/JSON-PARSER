@@ -7,22 +7,49 @@ import json
 ATRIB_PLAYER = ["startLocationId", "attack", "defense", "life"]
 ATRIB_OPCIONAIS = ["max_itens", "max_turns_easy",
                    "max_turns_normal", "max_turns_hard"]
-# acoes permitidas ao usuario
-COMANDOS = ["usar", "pegar", "andar", "mover", "invetario", "ajuda"]
 
 
 class DataManipulator:
     def __init__(self, path_dataset, filename):
         self.dict_data = self.pegar_JSON(path_dataset, filename)
-        chaves = self.dict_data.keys()
+        # acoes permitidas ao usuario
+        self.COMANDOS = ["usar", "pegar", "andar",
+                         "mover", "inventario", "ajuda"]
 
     def pegar_JSON(self, path_dataset, filename):
         path_json = os.path.join(path_dataset, filename)
         with open(path_json, "r") as file:
             data = json.load(file)
             # dados retornados como dict
-            print(f"JSON: {data}\n\n")
+            # print(f"JSON: {data}\n\n")
             return data
 
     def get_data(self, arg):
         return self.dict_data[str(arg)]
+
+    def parse_input(self, in_: str):
+        """
+        Faz parse do input, analisa se comandos estao corretos.
+        retorna inteiro para erro ou lista contendo comando ou comando e alvo
+        """
+
+        sequencia_str = in_.split(" |,|;")
+        tam_seq = len(sequencia_str)
+        if tam_seq == 1:
+            comando = sequencia_str[0]
+            if comando in ["inventario", "ajuda"]:
+                return [comando, ""]
+            else:
+                # comando de 1 palavra errado
+                return [-1, -1]
+        elif (tam_seq == 2):
+            comando = sequencia_str[0]
+            if comando in ["usar", "pegar", "andar", "mover"]:
+                alvo = sequencia_str[1]
+                return [comando, alvo]
+            else:
+                # comando de 2 palavras errado
+                return [-2, -2]
+        else:
+            # comando de 3 palavras, nao existe
+            return [-3, -3]

@@ -39,5 +39,11 @@ class View:
         str = f"{tab}{leading}{conteudo}{trail}{nl}"
         print(str)
 
+    def print_erro(self, num_erro):
+        if num_erro == -1 or num_erro == -2:
+            print("Comando inexistente")
+        else:
+            print("Palavras sem sentido!")
+
     def print_dialogo(self):
         pass

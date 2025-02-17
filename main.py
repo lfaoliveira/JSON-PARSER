@@ -13,5 +13,11 @@ if __name__ == "__main__":
     model = DataManipulator(path_dataset, filename)
     printer = View(model)
     ctrl = Controller(model)
-    ctrl.machine.iniciarjogo()
-    print(ctrl.machine.state)
+    ctrl.trigger("iniciarjogo")
+    print(ctrl.state, "\n")
+    while ctrl.not_end():
+        comando, alvo = model.parse_input(input(">>> "))
+        if type(comando) == int:
+            printer.print_erro(comando)
+        else:
+            ctrl.executar_comando(comando, alvo)

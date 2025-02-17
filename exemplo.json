@@ -1,7 +1,7 @@
 {
-"title": "",
-"description": "",
-"author": "",
+"title": "Caverna do Dragao",
+"description": "Nome sem sentido pq nao tem caverna",
+"author": "Eu",
 "startLocationId": "1",
 "max_itens" : "",
 "max_turns_easy" : "",
@@ -78,7 +78,136 @@
         ]
     },
     {
-
+        "id": "2",
+        "name": "B",
+        "description": "asdaafsssssscsscs",
+        "exits": [
+            {
+            "direction": "",
+            "targetLocationId": "",
+            "description": "",
+            "inactive": true
+            }
+        ],
+        "items": [
+            {"id": "",
+            "name": "",
+            "description": "",
+            "can_take": false,
+            "inactive": false
+            }],
+        "npcs": [
+            {
+            "id": "",
+            "name": "",
+            "description": "",
+            "inactive": true,
+            "dialogues": [
+                {
+                "text": "",
+                    "responses": [ 
+                    {
+                        "result": {
+                            "active": [],
+                            "lose_item": []
+                        }
+                    }
+                    ]
+                }
+            ]
+        }],
+        "puzzles": [
+            {
+                "id": "",
+                "description": "",
+                "solution": {
+                    "requiredItems": [],
+                    "actions": ""
+                },
+                "result": {
+                    "active": [],
+                    "lose_item": [],
+                    "lose_life": 12
+                }
+            }
+        ],
+        "enemies": [
+            {
+                "attack": 12,
+                "defense": 7,
+                "result": {
+                    "active": [],
+                    "lose_item": [],
+                    "lose_life": 12
+                }
+            }
+        ]
+    },
+    {
+        "id": "3",
+        "name": "C",
+        "description": "bghjhjkkkkkkkkyyk",
+        "exits": [
+            {
+            "direction": "",
+            "targetLocationId": "",
+            "description": "",
+            "inactive": true
+            }
+        ],
+        "items": [
+            {"id": "",
+            "name": "",
+            "description": "",
+            "can_take": false,
+            "inactive": false
+            }],
+        "npcs": [
+            {
+            "id": "",
+            "name": "",
+            "description": "",
+            "inactive": true,
+            "dialogues": [
+                {
+                "text": "",
+                    "responses": [ 
+                    {
+                        "result": {
+                            "active": [],
+                            "lose_item": []
+                        }
+                    }
+                    ]
+                }
+            ]
+        }],
+        "puzzles": [
+            {
+                "id": "",
+                "description": "",
+                "solution": {
+                    "requiredItems": [],
+                    "actions": ""
+                },
+                "result": {
+                    "active": [],
+                    "lose_item": [],
+                    "lose_life": 12
+                }
+            }
+        ],
+        "enemies": [
+            {
+                "attack": 12,
+                "defense": 7,
+                "result": {
+                    "active": [],
+                    "lose_item": [],
+                    "lose_life": 12
+                }
+            }
+        ]
     }
 ]
 } 

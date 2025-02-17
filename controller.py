@@ -12,30 +12,62 @@ from transitions import Transition
 
 estados = ['inicial', 'esperando', 'movendo', 'pegando',
            'largando', 'atacando', 'interagindo',
-           'dialogando', 'executando', 'andando', 'defendendo']
+           'dialogando', 'executando', 'andando', 'defendendo', 'end']
 
 transitions = [
-    {'trigger': 'iniciarjogo', 'source': 'inicial',
-        'dest': 'esperando'},  # iniciarJogo 'conditions': 'startLocationId'
-    {'trigger': 'mover', 'source': 'esperando',
-        'dest': 'movendo'},  # mover , 'conditions': ["direcao", "id_local"]
-    {'trigger': 'interagir', 'source': 'esperando',
-        'dest': 'interagindo'},  # interagir 'conditions': 'id_item'
-    {'trigger': 'atacar', 'source': 'esperando',
-        'dest': 'atacando', },  # atacar 'conditions': 'id_enemy'
-    # {'trigger': '', 'source': '', 'dest': ''}
+    {'trigger': 'iniciarjogo',  # iniciarJogo 'conditions': 'startLocationId'
+     'source': 'inicial',
+     'dest': 'esperando'},
+    {'trigger': 'mover',  # mover , 'conditions': ["direcao", "id_local"]
+     'source': 'esperando',
+     'dest': 'movendo'},
+    {'trigger': 'interagir',  # interagir 'conditions': 'id_item'
+     'source': 'esperando',
+     'dest': 'interagindo'},
+    {'trigger': 'atacar',  # atacar 'conditions': 'id_enemy'
+     'source': 'esperando',
+     'dest': 'atacando'},
+    {'trigger': 'andar',  # andar
+     'source': 'esperando',
+     'dest': 'andando'},
+    {'trigger': 'inventario',  # inventario
+     'source': 'esperando',
+     'dest': '='},
+    {'trigger': 'ajuda',  # ajuda
+     'source': 'esperando',
+     'dest': '=',
+     'after': 'mostrar_ajuda'}
+
+
+    # {'trigger': '',
+    #  'source': '',
+    #  'dest': ''}
 ]
 
 
-class Controller(object):
+class Controller(Machine):
     """
     Classe para controlar mudanças de estado
     """
 
     def __init__(self, manipulador: DataManipulator):
-        self.model = manipulador
-        self.machine = Machine(
-            states=estados, transitions=transitions, initial='inicial')
+        self.manipulador = manipulador
+        # dict de mapeamento de comando pra trigger da maquina de estados
+        self.mapeamento = {'usar': 'interagir', 'pegar': 'interagir', 'andar': 'andar',
+                           'mover': 'mover', 'inventario': 'inventario', 'ajuda': 'ajuda'}
+        super().__init__(model=self, states=estados,
+                         transitions=transitions, initial='inicial', name="EngineJogo")
 
     def mover(self, direcao, id_local):
         pass
+
+    def executar_comando(self, comando, alvo):
+        trigger = self.mapeamento[comando]
+        self.trigger(trigger, kwargs=alvo)
+
+    def mostrar_ajuda(self, **kwargs):
+        a = kwargs
+        print("AJUDANDO", a)
+
+    def not_end(self):
+        return self.state != "end"
