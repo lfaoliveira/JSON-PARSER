@@ -11,40 +11,31 @@ class View:
         self.attack = model.get_data("attack")
         self.defense = model.get_data("defense")
         self.life = model.get_data("life")
+
         # variaveis de texto
-        self.tab = " "*3
-        self.leading = "# "
-        self.trail = " #"
+        self.tab = " " * 3
+        self.leading = ""
+        self.trail = ""
 
     def print_inicial(self, local_inicial: list[str]):
         max_width = 100
-        str = "#"*30
-        print(str)
+        separator = "#" * 30
+        print(self.tab + separator)
 
-        str = f"Titulo: {self.title}"
-        self.ligar_str(self.tab, self.leading, str, self.trail, nl="\n\n")
-        self.ligar_str(tab=self.tab, conteudo="#")
-        self.ligar_str(tab=self.tab, conteudo="#")
+        self.print_with_formatting(f"Titulo: {self.title}", "\n\n")
+        self.print_with_formatting("#")
+        self.print_with_formatting("#")
+        self.print_with_formatting(f"Descrição: {self.desc}")
+        self.print_with_formatting(f"Criado por: {self.author}")
+        self.print_with_formatting(f"Local: {local_inicial[0]}", "\n")
+        self.print_with_formatting(f"{local_inicial[1]}")
 
-        str = f"Descrição: {self.desc}"
+    def print_with_formatting(self, content: str, newline: str = ""):
+        formatted_str = f"{self.tab}{self.leading}{content}{self.trail}{newline}"
+        print(formatted_str)
 
-        self.ligar_str(self.tab, self.leading, str, self.trail)
-
-        str = f"Criado por: {self.author}"
-        self.ligar_str(self.tab, self.leading, str)
-
-        str = f"Local: {local_inicial[0]}"
-        self.ligar_str("\n" + self.tab, self.leading, str, nl="\n")
-
-        str = f"{local_inicial[1]}"
-        self.ligar_str(self.tab, self.leading, str)
-
-    def ligar_str(self, tab="", leading="", conteudo="", trail="", nl=""):
-        str = f"{tab}{leading}{conteudo}{trail}{nl}"
-        print(str)
-
-    def print_erro(self, num_erro):
-        if num_erro == -1 or num_erro == -2:
+    def print_erro(self, num_erro: int):
+        if num_erro in (-1, -2):
             print("Comando inexistente")
         else:
             print("Palavras sem sentido!")

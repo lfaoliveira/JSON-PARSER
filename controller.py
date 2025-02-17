@@ -68,8 +68,8 @@ class Controller(Machine):
         trigger = self.mapeamento[comando]
         self.trigger(trigger, kwargs=alvo)
 
-    def mostrar_ajuda(self):
-        print("COMO JOGAR: ")
+    def mostrar_ajuda(self, **kwargs):
+        print("COMO JOGAR: \n")
         print("Comandos: usar, pegar, andar, mover, inventario, ajuda")
         print("USO: usar nome do item")
         print("USO: pegar nome do item")
