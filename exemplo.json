@@ -1,213 +1,212 @@
 {
-"title": "Caverna do Dragao",
-"description": "Nome sem sentido pq nao tem caverna",
-"author": "Eu",
-"startLocationId": "0",
-"max_itens" : "",
-"max_turns_easy" : "",
-"max_turns_normal" : "",
-"max_turns_hard" : "",
-"attack" : 10,
-"defense" : 8,
-"life" : 22,
-"locations": [
-    {
-        "id": "0",
-        "name": "Local de Chegada",
-        "description": "Voce se encontra em um mundo maluco em que um velho semi-calvo fala enigmas sem sentido",
-        "exits": [
-            {
-            "direction": "",
-            "targetLocationId": "",
-            "description": "",
-            "inactive": true
-            }
-        ],
-        "items": [
-            {"id": "",
-            "name": "",
-            "description": "",
-            "can_take": false,
-            "inactive": false
-            }],
-        "npcs": [
-            {
-            "id": "",
-            "name": "",
-            "description": "",
-            "inactive": true,
-            "dialogues": [
+    "title": "Caverna do Dragao",
+    "description": "Nome sem sentido pq nao tem caverna",
+    "author": "Eu",
+    "startLocationId": "0",
+    "max_itens": "10",
+    "max_turns_easy": "20",
+    "max_turns_normal": "15",
+    "max_turns_hard": "10",
+    "attack": 10,
+    "defense": 8,
+    "life": 22,
+    "locations": [
+        {
+            "id": "0",
+            "name": "Local de Chegada",
+            "description": "Voce se encontra em um mundo maluco em que um velho semi-calvo fala enigmas sem sentido",
+            "exits": [
                 {
-                "text": "",
-                    "responses": [ 
-                    {
-                        "result": {
-                            "active": [],
-                            "lose_item": []
+                    "direction": "north",
+                    "targetLocationId": "1",
+                    "description": "Um caminho para o norte",
+                    "inactive": false
+                }
+            ],
+            "items": [
+                {
+                    "id": "item1",
+                    "name": "Espada",
+                    "description": "Uma espada brilhante",
+                    "can_take": true,
+                    "inactive": false
+                }
+            ],
+            "npcs": [
+                {
+                    "id": "npc1",
+                    "name": "Velho Sábio",
+                    "description": "Um velho sábio que fala enigmas",
+                    "inactive": false,
+                    "dialogues": [
+                        {
+                            "text": "Bem-vindo, jovem aventureiro!",
+                            "responses": [
+                                {
+                                    "result": {
+                                        "active": ["npc1"],
+                                        "lose_item": []
+                                    }
+                                }
+                            ]
                         }
-                    }
                     ]
                 }
-            ]
-        }],
-        "puzzles": [
-            {
-                "id": "",
-                "description": "",
-                "solution": {
-                    "requiredItems": [],
-                    "actions": ""
-                },
-                "result": {
-                    "active": [],
-                    "lose_item": [],
-                    "lose_life": 12
-                }
-            }
-        ],
-        "enemies": [
-            {
-                "attack": 12,
-                "defense": 7,
-                "result": {
-                    "active": [],
-                    "lose_item": [],
-                    "lose_life": 12
-                }
-            }
-        ]
-    },
-    {
-        "id": "1",
-        "name": "B",
-        "description": "asdaafsssssscsscs",
-        "exits": [
-            {
-            "direction": "",
-            "targetLocationId": "",
-            "description": "",
-            "inactive": true
-            }
-        ],
-        "items": [
-            {"id": "",
-            "name": "",
-            "description": "",
-            "can_take": false,
-            "inactive": false
-            }],
-        "npcs": [
-            {
-            "id": "",
-            "name": "",
-            "description": "",
-            "inactive": true,
-            "dialogues": [
+            ],
+            "puzzles": [
                 {
-                "text": "",
-                    "responses": [ 
-                    {
-                        "result": {
-                            "active": [],
-                            "lose_item": []
-                        }
+                    "id": "puzzle1",
+                    "description": "Um enigma complicado",
+                    "solution": {
+                        "requiredItems": ["item1"],
+                        "actions": "usar"
+                    },
+                    "result": {
+                        "active": ["puzzle1"],
+                        "lose_item": ["item1"],
+                        "lose_life": 0
                     }
+                }
+            ],
+            "enemies": []
+        },
+        {
+            "id": "1",
+            "name": "Floresta",
+            "description": "Uma floresta densa e escura",
+            "exits": [
+                {
+                    "direction": "south",
+                    "targetLocationId": "0",
+                    "description": "Um caminho para o sul",
+                    "inactive": false
+                }
+            ],
+            "items": [
+                {
+                    "id": "item2",
+                    "name": "Escudo",
+                    "description": "Um escudo resistente",
+                    "can_take": true,
+                    "inactive": false
+                }
+            ],
+            "npcs": [
+                {
+                    "id": "npc2",
+                    "name": "Guerreiro Perdido",
+                    "description": "Um guerreiro que perdeu seu caminho",
+                    "inactive": false,
+                    "dialogues": [
+                        {
+                            "text": "Você pode me ajudar a encontrar meu caminho?",
+                            "responses": [
+                                {
+                                    "result": {
+                                        "active": ["npc2"],
+                                        "lose_item": []
+                                    }
+                                }
+                            ]
+                        }
                     ]
                 }
-            ]
-        }],
-        "puzzles": [
-            {
-                "id": "",
-                "description": "",
-                "solution": {
-                    "requiredItems": [],
-                    "actions": ""
-                },
-                "result": {
-                    "active": [],
-                    "lose_item": [],
-                    "lose_life": 12
-                }
-            }
-        ],
-        "enemies": [
-            {
-                "attack": 12,
-                "defense": 7,
-                "result": {
-                    "active": [],
-                    "lose_item": [],
-                    "lose_life": 12
-                }
-            }
-        ]
-    },
-    {
-        "id": "2",
-        "name": "C",
-        "description": "bghjhjkkkkkkkkyyk",
-        "exits": [
-            {
-            "direction": "",
-            "targetLocationId": "",
-            "description": "",
-            "inactive": true
-            }
-        ],
-        "items": [
-            {"id": "",
-            "name": "",
-            "description": "",
-            "can_take": false,
-            "inactive": false
-            }],
-        "npcs": [
-            {
-            "id": "",
-            "name": "",
-            "description": "",
-            "inactive": true,
-            "dialogues": [
+            ],
+            "puzzles": [
                 {
-                "text": "",
-                    "responses": [ 
-                    {
-                        "result": {
-                            "active": [],
-                            "lose_item": []
-                        }
+                    "id": "puzzle2",
+                    "description": "Um enigma da floresta",
+                    "solution": {
+                        "requiredItems": ["item2"],
+                        "actions": "usar"
+                    },
+                    "result": {
+                        "active": ["puzzle2"],
+                        "lose_item": ["item2"],
+                        "lose_life": 0
                     }
+                }
+            ],
+            "enemies": [
+                {
+                    "attack": 14,
+                    "defense": 9,
+                    "result": {
+                        "active": [],
+                        "lose_item": [],
+                        "lose_life": 15
+                    }
+                }
+            ]
+        },
+        {
+            "id": "2",
+            "name": "Montanha",
+            "description": "Uma montanha alta e perigosa",
+            "exits": [
+                {
+                    "direction": "east",
+                    "targetLocationId": "1",
+                    "description": "Um caminho para o leste",
+                    "inactive": false
+                }
+            ],
+            "items": [
+                {
+                    "id": "item3",
+                    "name": "Poção",
+                    "description": "Uma poção de cura",
+                    "can_take": true,
+                    "inactive": false
+                }
+            ],
+            "npcs": [
+                {
+                    "id": "npc3",
+                    "name": "Mago Misterioso",
+                    "description": "Um mago que conhece muitos segredos",
+                    "inactive": false,
+                    "dialogues": [
+                        {
+                            "text": "Eu posso te ajudar, mas a um preço.",
+                            "responses": [
+                                {
+                                    "result": {
+                                        "active": ["npc3"],
+                                        "lose_item": []
+                                    }
+                                }
+                            ]
+                        }
                     ]
                 }
+            ],
+            "puzzles": [
+                {
+                    "id": "puzzle3",
+                    "description": "Um enigma da montanha",
+                    "solution": {
+                        "requiredItems": ["item3"],
+                        "actions": "usar"
+                    },
+                    "result": {
+                        "active": ["puzzle3"],
+                        "lose_item": ["item3"],
+                        "lose_life": 0
+                    }
+                }
+            ],
+            "enemies": [
+                {
+                    "attack": 16,
+                    "defense": 10,
+                    "result": {
+                        "active": [],
+                        "lose_item": [],
+                        "lose_life": 18
+                    }
+                }
             ]
-        }],
-        "puzzles": [
-            {
-                "id": "",
-                "description": "",
-                "solution": {
-                    "requiredItems": [],
-                    "actions": ""
-                },
-                "result": {
-                    "active": [],
-                    "lose_item": [],
-                    "lose_life": 12
-                }
-            }
-        ],
-        "enemies": [
-            {
-                "attack": 12,
-                "defense": 7,
-                "result": {
-                    "active": [],
-                    "lose_item": [],
-                    "lose_life": 12
-                }
-            }
-        ]
-    }
-]
-} 
+        }
+    ]
+}

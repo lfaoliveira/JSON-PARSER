@@ -1,9 +1,7 @@
 import os
 import json
+import re
 
-""" ATRIB_SIST = ["title", "description", "author", "startLocationId", "max_itens",
-              "max_turns_easy", "max_turns_normal", "max_turns_hard", "attack", "defense", "life"]
-"""
 ATRIB_PLAYER = ["startLocationId", "attack", "defense", "life"]
 ATRIB_OPCIONAIS = ["max_itens", "max_turns_easy",
                    "max_turns_normal", "max_turns_hard"]
@@ -13,8 +11,14 @@ class DataManipulator:
     def __init__(self, path_dataset, filename):
         self.dict_data = self.pegar_JSON(path_dataset, filename)
         # acoes permitidas ao usuario
-        self.COMANDOS = ["usar", "pegar", "andar",
+        self.COMANDOS = ["usar", "olhar", "pegar", "andar",
                          "mover", "inventario", "ajuda"]
+
+        self.itens = []
+
+        for atrib in ATRIB_OPCIONAIS:
+            if atrib in self.dict_data.keys():
+                self.__setattr__(atrib, self.dict_data[atrib])
 
     def pegar_JSON(self, path_dataset, filename):
         path_json = os.path.join(path_dataset, filename)
@@ -41,11 +45,11 @@ class DataManipulator:
         retorna inteiro para erro ou lista contendo comando ou comando e alvo
         """
 
-        sequencia_str = in_.split(" |,|;")
+        sequencia_str = re.split(r"\s|;|,", in_)
         tam_seq = len(sequencia_str)
         if tam_seq == 1:
             comando = sequencia_str[0]
-            if comando in ["inventario", "ajuda"]:
+            if comando in ["olhar", "inventario", "ajuda"]:
                 return [comando, ""]
             elif comando == "sair":
                 exit(0)
@@ -63,3 +67,16 @@ class DataManipulator:
         else:
             # comando de 3 palavras, nao existe
             return [-3, -3]
+
+    def add_inventario(self, alvo):
+        """
+        Adiciona item ao inventario com base em max_itens
+        """
+        if self.__getattribute__("max_itens") is None:
+            self.itens.append(alvo)
+        else:
+            if len(self.itens) < self.max_itens:
+                self.itens.append(alvo)
+            else:
+                return False
+        return True

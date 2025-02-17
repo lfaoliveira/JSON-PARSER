@@ -20,15 +20,6 @@ transitions = [
      'source': 'inicial',
      'dest': 'esperando',
      'after': 'desc_inicial'},
-    {'trigger': 'mover',  # mover , 'conditions': ["direcao", "id_local"]
-     'source': 'esperando',
-     'dest': 'movendo'},
-    {'trigger': 'interagir',  # interagir 'conditions': 'id_item'
-     'source': 'esperando',
-     'dest': 'interagindo'},
-    {'trigger': 'atacar',  # atacar 'conditions': 'id_enemy'
-     'source': 'esperando',
-     'dest': 'atacando'},
     {'trigger': 'andar',  # andar
      'source': 'esperando',
      'dest': 'andando'},
@@ -38,7 +29,18 @@ transitions = [
     {'trigger': 'ajuda',  # ajuda
      'source': 'esperando',
      'dest': '=',
-     'after': 'mostrar_ajuda'}
+     'after': 'mostrar_ajuda'},
+    {'trigger': 'mover',  # mover , 'conditions': ["direcao", "id_local"]
+     'source': 'esperando',
+     'dest': 'movendo'},
+    {'trigger': 'interagir',  # interagir 'conditions': 'id_item'
+     'source': 'esperando',
+     'dest': 'interagindo',
+     'after': 'pegar'},
+    {'trigger': 'atacar',  # atacar 'conditions': 'id_enemy'
+     'source': 'esperando',
+     'dest': 'atacando'},
+
 
 
     # {'trigger': '',
@@ -70,10 +72,11 @@ class Controller(Machine):
 
     def mostrar_ajuda(self, **kwargs):
         print("COMO JOGAR: \n")
-        print("Comandos: usar, pegar, andar, mover, inventario, ajuda")
-        print("USO: usar nome do item")
-        print("USO: pegar nome do item")
-        print("USO: mover nome do item")
+        print("Comandos: usar, olhar, pegar, andar, mover, inventario, ajuda")
+        print("USO: usar <nome do item>")
+        print("USO: pegar <nome do item>")
+        print("USO: olhar mostra a sala atual")
+        print("USO: mover <nome do item>")
         print("USO: andar direcao(norte, sul, leste, oeste e derivados)")
         print("USO: inventario: mostra inventario")
         print("USO: ajuda: pede ajuda pro computador")
@@ -86,6 +89,11 @@ class Controller(Machine):
         nome = self.manipulador.get_data_rec(
             ["locations", int(id_inicial), "name"])
         self.printer.print_inicial([nome, desc])
+
+    def pegar(self, alvo):
+        resp = self.manipulador.add_inventario(alvo)
+        if resp == False:
+            adafaffafaef = 0
 
     def not_end(self):
         return self.state != "end"

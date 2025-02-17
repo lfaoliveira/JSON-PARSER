@@ -25,7 +25,8 @@ class View:
         self.print_with_formatting(f"Titulo: {self.title}", "\n\n")
         self.print_with_formatting("#")
         self.print_with_formatting("#")
-        self.print_with_formatting(f"Descrição: {self.desc}")
+        self.print_with_formatting(f"Escreva 'ajuda' para ver os comandos ")
+        self.print_with_formatting(f"Descrição do Jogo: {self.desc}")
         self.print_with_formatting(f"Criado por: {self.author}")
         self.print_with_formatting(f"Local: {local_inicial[0]}", "\n")
         self.print_with_formatting(f"{local_inicial[1]}")
@@ -34,11 +35,8 @@ class View:
         formatted_str = f"{self.tab}{self.leading}{content}{self.trail}{newline}"
         print(formatted_str)
 
-    def print_erro(self, num_erro: int):
-        if num_erro in (-1, -2):
-            print("Comando inexistente")
-        else:
-            print("Palavras sem sentido!")
+    def print_erro(self, num_erro: int, dict_erro: dict):
+        print(dict_erro[num_erro])
 
     def print_dialogo(self):
         pass
