@@ -12,9 +12,8 @@ if __name__ == "__main__":
     # modelo pega todos os atributos do JSON
     model = DataManipulator(path_dataset, filename)
     printer = View(model)
-    ctrl = Controller(model)
+    ctrl = Controller(model, printer)
     ctrl.trigger("iniciarjogo")
-    print(ctrl.state, "\n")
     while ctrl.not_end():
         comando, alvo = model.parse_input(input(">>> "))
         if type(comando) == int:

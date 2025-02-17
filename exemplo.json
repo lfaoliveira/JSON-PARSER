@@ -2,7 +2,7 @@
 "title": "Caverna do Dragao",
 "description": "Nome sem sentido pq nao tem caverna",
 "author": "Eu",
-"startLocationId": "1",
+"startLocationId": "0",
 "max_itens" : "",
 "max_turns_easy" : "",
 "max_turns_normal" : "",
@@ -12,9 +12,9 @@
 "life" : 22,
 "locations": [
     {
-        "id": "1",
-        "name": "A",
-        "description": "adafefafaefafefaeafefaef",
+        "id": "0",
+        "name": "Local de Chegada",
+        "description": "Voce se encontra em um mundo maluco em que um velho semi-calvo fala enigmas sem sentido",
         "exits": [
             {
             "direction": "",
@@ -78,7 +78,7 @@
         ]
     },
     {
-        "id": "2",
+        "id": "1",
         "name": "B",
         "description": "asdaafsssssscsscs",
         "exits": [
@@ -144,7 +144,7 @@
         ]
     },
     {
-        "id": "3",
+        "id": "2",
         "name": "C",
         "description": "bghjhjkkkkkkkkyyk",
         "exits": [

@@ -5,6 +5,7 @@ from os import system
 from os.path import exists
 from click import getchar
 from model import DataManipulator
+from view import View
 from transitions import Machine
 from transitions import Transition
 
@@ -17,7 +18,8 @@ estados = ['inicial', 'esperando', 'movendo', 'pegando',
 transitions = [
     {'trigger': 'iniciarjogo',  # iniciarJogo 'conditions': 'startLocationId'
      'source': 'inicial',
-     'dest': 'esperando'},
+     'dest': 'esperando',
+     'after': 'desc_inicial'},
     {'trigger': 'mover',  # mover , 'conditions': ["direcao", "id_local"]
      'source': 'esperando',
      'dest': 'movendo'},
@@ -50,8 +52,9 @@ class Controller(Machine):
     Classe para controlar mudanças de estado
     """
 
-    def __init__(self, manipulador: DataManipulator):
+    def __init__(self, manipulador: DataManipulator, printer: View):
         self.manipulador = manipulador
+        self.printer = printer
         # dict de mapeamento de comando pra trigger da maquina de estados
         self.mapeamento = {'usar': 'interagir', 'pegar': 'interagir', 'andar': 'andar',
                            'mover': 'mover', 'inventario': 'inventario', 'ajuda': 'ajuda'}
@@ -65,9 +68,24 @@ class Controller(Machine):
         trigger = self.mapeamento[comando]
         self.trigger(trigger, kwargs=alvo)
 
-    def mostrar_ajuda(self, **kwargs):
-        a = kwargs
-        print("AJUDANDO", a)
+    def mostrar_ajuda(self):
+        print("COMO JOGAR: ")
+        print("Comandos: usar, pegar, andar, mover, inventario, ajuda")
+        print("USO: usar nome do item")
+        print("USO: pegar nome do item")
+        print("USO: mover nome do item")
+        print("USO: andar direcao(norte, sul, leste, oeste e derivados)")
+        print("USO: inventario: mostra inventario")
+        print("USO: ajuda: pede ajuda pro computador")
+
+    def desc_inicial(self):
+        id_inicial = self.manipulador.get_data("startLocationId")
+        # considerando que locations eh lista ordenada
+        desc = self.manipulador.get_data_rec(
+            ["locations", int(id_inicial), "description"])
+        nome = self.manipulador.get_data_rec(
+            ["locations", int(id_inicial), "name"])
+        self.printer.print_inicial([nome, desc])
 
     def not_end(self):
         return self.state != "end"

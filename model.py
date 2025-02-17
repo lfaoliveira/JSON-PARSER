@@ -24,8 +24,16 @@ class DataManipulator:
             # print(f"JSON: {data}\n\n")
             return data
 
+    def get_data_rec(self, args: list):
+        """funcao para pegar propriedades de objetos recursivamente"""
+        data = self.dict_data
+        for arg in args:
+            data = data[arg]
+        return data
+
     def get_data(self, arg):
-        return self.dict_data[str(arg)]
+        """funcao para pegar dados normalmente"""
+        return self.dict_data[arg]
 
     def parse_input(self, in_: str):
         """
@@ -39,6 +47,8 @@ class DataManipulator:
             comando = sequencia_str[0]
             if comando in ["inventario", "ajuda"]:
                 return [comando, ""]
+            elif comando == "sair":
+                exit(0)
             else:
                 # comando de 1 palavra errado
                 return [-1, -1]

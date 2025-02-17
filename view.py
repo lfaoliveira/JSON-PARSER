@@ -16,9 +16,7 @@ class View:
         self.leading = "# "
         self.trail = " #"
 
-        self.print_inicial()
-
-    def print_inicial(self):
+    def print_inicial(self, local_inicial: list[str]):
         max_width = 100
         str = "#"*30
         print(str)
@@ -33,7 +31,13 @@ class View:
         self.ligar_str(self.tab, self.leading, str, self.trail)
 
         str = f"Criado por: {self.author}"
-        self.ligar_str(self.tab, self.leading, str, self.trail)
+        self.ligar_str(self.tab, self.leading, str)
+
+        str = f"Local: {local_inicial[0]}"
+        self.ligar_str("\n" + self.tab, self.leading, str, nl="\n")
+
+        str = f"{local_inicial[1]}"
+        self.ligar_str(self.tab, self.leading, str)
 
     def ligar_str(self, tab="", leading="", conteudo="", trail="", nl=""):
         str = f"{tab}{leading}{conteudo}{trail}{nl}"
