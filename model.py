@@ -8,7 +8,7 @@ ATRIB_PLAYER = ["startLocationId", "attack", "defense", "life"]
 ATRIB_OPCIONAIS = ["max_itens", "max_turns_easy",
                    "max_turns_normal", "max_turns_hard"]
 # acoes permitidas ao usuario
-COMANDOS = ["usar", "pegar", "andar", "mover", "listar", "ajuda"]
+COMANDOS = ["usar", "pegar", "andar", "mover", "invetario", "ajuda"]
 
 
 class DataManipulator:
@@ -24,5 +24,5 @@ class DataManipulator:
             print(f"JSON: {data}\n\n")
             return data
 
-    def get_data(self):
-        return self.dict_data
+    def get_data(self, arg):
+        return self.dict_data[str(arg)]

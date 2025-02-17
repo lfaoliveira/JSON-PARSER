@@ -2,7 +2,7 @@
 "title": "",
 "description": "",
 "author": "",
-"startLocationId": "",
+"startLocationId": "1",
 "max_itens" : "",
 "max_turns_easy" : "",
 "max_turns_normal" : "",
@@ -12,70 +12,73 @@
 "life" : 22,
 "locations": [
     {
-    "id": "",
-    "name": "",
-    "description": "",
-    "exits": [
-        {
-        "direction": "",
-        "targetLocationId": "",
-        "description": "",
-        "inactive": true
-        }
-    ],
-    "items": [
-        {"id": "",
-        "name": "",
-        "description": "",
-        "can_take": false,
-        "inactive": false
-        }],
-    "npcs": [
-        {
-        "id": "",
-        "name": "",
-        "description": "",
-        "inactive": true,
-        "dialogues": [
+        "id": "1",
+        "name": "A",
+        "description": "adafefafaefafefaeafefaef",
+        "exits": [
             {
-            "text": "",
-                "responses": [ 
+            "direction": "",
+            "targetLocationId": "",
+            "description": "",
+            "inactive": true
+            }
+        ],
+        "items": [
+            {"id": "",
+            "name": "",
+            "description": "",
+            "can_take": false,
+            "inactive": false
+            }],
+        "npcs": [
+            {
+            "id": "",
+            "name": "",
+            "description": "",
+            "inactive": true,
+            "dialogues": [
                 {
-                    "result": {
-                        "active": [],
-                        "lose_item": []
+                "text": "",
+                    "responses": [ 
+                    {
+                        "result": {
+                            "active": [],
+                            "lose_item": []
+                        }
                     }
+                    ]
                 }
-                ]
+            ]
+        }],
+        "puzzles": [
+            {
+                "id": "",
+                "description": "",
+                "solution": {
+                    "requiredItems": [],
+                    "actions": ""
+                },
+                "result": {
+                    "active": [],
+                    "lose_item": [],
+                    "lose_life": 12
+                }
+            }
+        ],
+        "enemies": [
+            {
+                "attack": 12,
+                "defense": 7,
+                "result": {
+                    "active": [],
+                    "lose_item": [],
+                    "lose_life": 12
+                }
             }
         ]
-    }],
-    "puzzles": [
-        {
-            "id": "",
-            "description": "",
-            "solution": {
-                "requiredItems": [],
-                "actions": ""
-            },
-            "result": {
-                "active": [],
-                "lose_item": [],
-                "lose_life": 12
-            }
-        }
-    ],
-    "enemies": [
-        {
-            "attack": 12,
-            "defense": 7,
-            "result": {
-                "active": [],
-                "lose_item": [],
-                "lose_life": 12
-            }
-        }
-    ]
+    },
+    {
+
     }
 ]
 } 

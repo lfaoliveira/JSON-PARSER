@@ -1,15 +1,16 @@
-# import
+from model import DataManipulator
+
 
 class View:
-    def __init__(self, data):
+    def __init__(self, model: DataManipulator):
         # dados
-        self.author = data["author"]
-        self.title = data["title"]
-        self.desc = data["description"]
-        self.startLocationId = data["startLocationId"]
-        self.attack = data["attack"]
-        self.defense = data["defense"]
-        self.life = data["life"]
+        self.author = model.get_data("author")
+        self.title = model.get_data("title")
+        self.desc = model.get_data("description")
+        self.startLocationId = model.get_data("startLocationId")
+        self.attack = model.get_data("attack")
+        self.defense = model.get_data("defense")
+        self.life = model.get_data("life")
         # variaveis de texto
         self.tab = " "*3
         self.leading = "# "

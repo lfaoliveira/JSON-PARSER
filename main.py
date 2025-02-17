@@ -11,4 +11,7 @@ if __name__ == "__main__":
     filename = "exemplo.json"
     # modelo pega todos os atributos do JSON
     model = DataManipulator(path_dataset, filename)
-    printer = View(model.get_data)
+    printer = View(model)
+    ctrl = Controller(model)
+    ctrl.machine.iniciarjogo()
+    print(ctrl.machine.state)

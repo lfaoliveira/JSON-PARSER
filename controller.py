@@ -4,6 +4,7 @@ import sys
 from os import system
 from os.path import exists
 from click import getchar
+from model import DataManipulator
 from transitions import Machine
 from transitions import Transition
 
@@ -14,43 +15,27 @@ estados = ['inicial', 'esperando', 'movendo', 'pegando',
            'dialogando', 'executando', 'andando', 'defendendo']
 
 transitions = [
-    {'trigger': 'iniciarJogo', 'source': 'inicial',
-        'dest': 'esperando'},  # iniciarJogo
+    {'trigger': 'iniciarjogo', 'source': 'inicial',
+        'dest': 'esperando'},  # iniciarJogo 'conditions': 'startLocationId'
     {'trigger': 'mover', 'source': 'esperando',
-        'dest': 'movendo', 'kwargs': ["direcao", "id_local"]},  # mover
+        'dest': 'movendo'},  # mover , 'conditions': ["direcao", "id_local"]
     {'trigger': 'interagir', 'source': 'esperando',
-        'dest': 'interagindo', 'kwargs': ["id_item"]},  # interagir
+        'dest': 'interagindo'},  # interagir 'conditions': 'id_item'
     {'trigger': 'atacar', 'source': 'esperando',
-        'dest': 'atacando', 'kwargs': ["id_enemy"]},  # atacar
-    {'trigger': '', 'source': '', 'dest': ''}
+        'dest': 'atacando', },  # atacar 'conditions': 'id_enemy'
+    # {'trigger': '', 'source': '', 'dest': ''}
 ]
 
 
-class Controller:
-    def __init__(self, dict_data):
-        self.dict_data = dict_data
+class Controller(object):
+    """
+    Classe para controlar mudanças de estado
+    """
 
-        self.machine = Machine(model=self, states=estados, initial='inicial')
+    def __init__(self, manipulador: DataManipulator):
+        self.model = manipulador
+        self.machine = Machine(
+            states=estados, transitions=transitions, initial='inicial')
 
-        # Add some transitions. We could also define these using a static list of
-        # dictionaries, as we did with states above, and then pass the list to
-        # the Machine initializer as the transitions= argument.
-
-        # transicao de mover
-        self.machine.add_transition(
-            trigger='', source='', dest='', )
-
-        # transicao para interagir
-        self.machine.add_transition(
-            trigger='', source='', dest='', )
-
-        #
-        self.machine.add_transition(
-            trigger='', source='', dest='', kwargs=["id_item"])
-
-        #
-        self.machine.add_transition('', '*', '',
-                                    before='')
-
-    def mover(direcao, id_local):
+    def mover(self, direcao, id_local):
         pass
