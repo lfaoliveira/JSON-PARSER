@@ -58,8 +58,8 @@ class Controller(Machine):
         self.manipulador = manipulador
         self.printer = printer
         # dict de mapeamento de comando pra trigger da maquina de estados
-        self.mapeamento = {'usar': 'interagir', 'pegar': 'interagir', 'andar': 'andar',
-                           'mover': 'mover', 'inventario': 'inventario', 'ajuda': 'ajuda'}
+        self.mapeamento_cmd = {'usar': 'interagir', 'pegar': 'interagir', 'andar': 'andar',
+                               'mover': 'mover', 'inventario': 'inventario', 'ajuda': 'ajuda'}
         super().__init__(model=self, states=estados,
                          transitions=transitions, initial='inicial', name="EngineJogo")
 
@@ -67,7 +67,7 @@ class Controller(Machine):
         pass
 
     def executar_comando(self, comando, alvo):
-        trigger = self.mapeamento[comando]
+        trigger = self.mapeamento_cmd[comando]
         self.trigger(trigger, kwargs=alvo)
 
     def mostrar_ajuda(self, **kwargs):
@@ -82,18 +82,47 @@ class Controller(Machine):
         print("USO: ajuda: pede ajuda pro computador")
 
     def desc_inicial(self):
-        id_inicial = self.manipulador.get_data("startLocationId")
         # considerando que locations eh lista ordenada
-        desc = self.manipulador.get_data_rec(
-            ["locations", int(id_inicial), "description"])
-        nome = self.manipulador.get_data_rec(
-            ["locations", int(id_inicial), "name"])
+        sala = self.manipulador.get_sala()
+        desc = sala["description"]
+        nome = sala["name"]
         self.printer.print_inicial([nome, desc])
 
-    def pegar(self, alvo):
-        resp = self.manipulador.add_inventario(alvo)
-        if resp == False:
-            adafaffafaef = 0
+    def pegar(self, **kwargs):
+        """
+        Recebe alvo e tenta adicionar alvo ao inventario\n
+        NOTE: alvo deve ser NOME do objeto\n
+        ------------\n
+        Returns:\n
+
+        """
+        # nome do objeto
+        alvo = kwargs.get("alvo", None)
+        falha = False
+        dict_falhas = {1: "ERRO NO PROGRAMA! Reinicie",
+                       2: "Item nao existe!",
+                       3: "Inventario cheio!"}
+
+        if alvo != None:
+            sala = self.manipulador.get_sala()
+            id_alvo = self.manipulador.hash_reverso(sala["items"], "id", alvo)
+            if id_alvo != None:
+                resp = self.manipulador.add_inventario(sala, id_alvo)
+                if resp == False:
+                    # nao deu pra botar
+                    falha = 3
+            else:
+                # nao achou alvo
+                falha = 2
+        else:
+            # deu alguma merda muito grande pra isso
+            falha = 1
+
+        # logica final de retorno
+        if falha:
+            return dict_falhas[falha]
+        else:
+            return True
 
     def not_end(self):
         return self.state != "end"
