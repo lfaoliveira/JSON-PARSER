@@ -63,12 +63,12 @@ class Controller(Machine):
         super().__init__(model=self, states=estados,
                          transitions=transitions, initial='inicial', name="EngineJogo")
 
-    def mover(self, direcao, id_local):
-        pass
-
     def executar_comando(self, comando, alvo):
         trigger = self.mapeamento_cmd[comando]
         self.trigger(trigger, kwargs=alvo)
+
+    def mover(self, direcao, id_local):
+        pass
 
     def mostrar_ajuda(self, **kwargs):
         print("COMO JOGAR: \n")
