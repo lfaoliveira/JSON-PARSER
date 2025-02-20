@@ -57,6 +57,30 @@ class DataManipulator:
         else:
             self.turnos = None
 
+    def escolha(self, opcoes: dict[int, str]):
+        """
+        ### Desc:
+        Faz input de escolha
+        Estrutura de opcoes: 
+        {num1: "nome", num2: "nome2", ...}\n
+        ---------------------------\n
+        ### Parameters:\n
+
+        Sempre retorna 
+        """
+        nums = [i + 1 for i in range(len(opcoes.keys()))]
+        a = input(">>> ")
+
+        # so aceita ate 9 escolhas
+        match = re.match(f'[{nums[0]}-{nums[-1]}]', a)
+        while (match == None):
+            print("Insira um número válido! ")
+            a = input(">>> ")
+            match = re.match(f'[{nums[0]}-{nums[-1]}]', a)
+        string = re.split(f"([{nums[0]}-{nums[-1]}])", match.string)[1]
+
+        return string
+
     def escolher_dificuldade(self):
 
         easy = self.max_turns_easy
@@ -64,27 +88,22 @@ class DataManipulator:
         hard = self.max_turns_hard
 
         difs = [(easy, "facil"), (med, "normal"), (hard, "dificil")]
-        # so fica que nao eh None
+        # so fica o que nao eh None
         difs = list(filter(lambda x: x[0] != None, difs))
         if len(difs) == 0:
             return None
         elif (len(difs) == 1):
             return difs[0]
 
-        nums = [i + 1 for i in range(len(difs))]
+        opcoes = {}
 
         print("Escolha um número de dificuldade: ")
         for i, dif in enumerate(difs):
-            print(f"{i+1}- {dif[1]}: {dif[0]} Turnos")
+            print(f"{i+1}) {dif[1]}: {dif[0]} Turnos")
+            opcoes[i] = dif[1]
 
-        a = input(">>> ")
-        match = re.match(f'[{nums[0]}-{nums[-1]}]', a)
-        while (match == None):
-            print("Insira um número válido! ")
-            a = input(">>> ")
-            match = re.match(f'[{nums[0]}-{nums[-1]}]', a)
-
-        idx = int(match.string) - 1
+        string = self.escolha(opcoes)
+        idx = int(string) - 1
         return difs[idx]
 
     def pegar_JSON(self, path_dataset: str, filename: str) -> dict:

@@ -32,9 +32,9 @@ class View:
         self.print_with_formatting(f"Local: {local_inicial[0]}", "\n")
         self.print_with_formatting(f"{local_inicial[1]}")
 
-    def print_with_formatting(self, content: str, newline: str = ""):
-        formatted_str = f"{self.tab}{self.leading}{content}{self.trail}{newline}"
-        print(formatted_str)
+    def print_with_formatting(self, content: str, newline: str = "\n"):
+        formatted_str = f"{self.tab}{self.leading}{content}{self.trail}"
+        print(formatted_str, end=newline)
 
     def print_elems(self, elems):
         """
@@ -46,10 +46,7 @@ class View:
             cont += 1
             if cont == len(elems):
                 end = "\n"
-            self.trail = end
-            self.print_with_formatting(elem)
-
-        self.trail = ""
+            self.print_with_formatting(elem, newline=end)
 
     def print_inventario(self, itens: list[str]):
         print("Inventario: ", end=" ")
@@ -73,10 +70,13 @@ class View:
         self.print_with_formatting(f"{name}: {desc}")
         self.print_with_formatting(f"Itens:")
         self.print_elems(itens)
+        print()
         self.print_with_formatting(f"Personagens:")
         self.print_elems(npcs)
+        print()
         self.print_with_formatting("Saídas: ")
         self.print_elems(exits)
+        print()
         self.print_with_formatting(f"Inimigos: {enemies}")
 
     def print_erro(self, num_erro: int, dict_erro: dict):
