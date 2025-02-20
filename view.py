@@ -36,6 +36,45 @@ class View:
         formatted_str = f"{self.tab}{self.leading}{content}{self.trail}{newline}"
         print(formatted_str)
 
+    def print_elems(self, elems):
+        """
+        Funcao de helper pra printar itens de uma lista
+        """
+        cont = 0
+        end = ", "
+        for elem in elems:
+            cont += 1
+            if cont == len(elems):
+                end = "\n"
+            self.trail = end
+            self.print_with_formatting(elem)
+
+        self.trail = ""
+        print("")
+
+    def print_inventario(self, itens: list[str]):
+        print("Inventario: ", end=" ")
+        self.print_elems(itens)
+
+    def print_olhar(self, **kwargs):
+        desc = kwargs.get("desc")
+        name = kwargs.get("name")
+        itens = kwargs.get("itens", [])
+        itens = [item["name"] for item in itens]
+        npcs = kwargs.get("npcs", [])
+
+        npcs = [
+            f"{npc['name']}: {npc['description']}" for npc in npcs]
+        npcs = [elem.encode("utf-16").decode("utf-16") for elem in npcs]
+        enemies = kwargs.get("enemies", [])
+
+        self.print_with_formatting(f"{name}: {desc}")
+        self.print_with_formatting(f"Itens:")
+        self.print_elems(itens)
+        self.print_with_formatting(f"Personagens:")
+        self.print_elems(npcs)
+        self.print_with_formatting(f"Inimigos: {enemies}")
+
     def print_erro(self, num_erro: int, dict_erro: dict):
         print(dict_erro[num_erro])
 

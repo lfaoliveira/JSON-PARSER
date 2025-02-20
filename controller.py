@@ -23,34 +23,37 @@ transitions = [
     {'trigger': 'andar',  # andar
      'source': 'esperando',
      'dest': 'andando'},
-    {'trigger': 'inventario',  # inventario
+    {'trigger': 'itens',  # inventario
      'source': 'esperando',
-     'dest': '='},
+     'dest': '=',
+     'after': 'mostrarInventario'},
+    {'trigger': 'olhar',  # olhar
+     'source': 'esperando',
+     'dest': '=',
+     'after': 'olhar'},
     {'trigger': 'ajuda',  # ajuda
      'source': 'esperando',
      'dest': '=',
      'after': 'mostrar_ajuda'},
     {'trigger': 'mover',  # mover , 'dados': "id_item, direcao"
      'source': 'esperando',
-     'dest': 'movendo',
+     'dest': '=',
      'after': 'moverObj'},
     {'trigger': 'pegar',  # pegar 'dados': 'id_item'
      'source': 'esperando',
-     'dest': 'interagindo',
+     'dest': '=',
      'after': 'pegar'},
-    {'trigger': 'usar',  # interagir 'dados': 'id_item'
+    {'trigger': 'soltar',  # soltar 'dados': 'id_item'
      'source': 'esperando',
-     'dest': 'interagindo',
+     'dest': '=',
+     'after': 'soltar'},
+    {'trigger': 'usar',  # usar 'dados': 'id_item'
+     'source': 'esperando',
+     'dest': '=',
      'after': 'usar'},
     {'trigger': 'atacar',  # atacar 'dados': 'id_enemy'
      'source': 'esperando',
      'dest': 'atacando'},
-
-
-
-    # {'trigger': '',
-    #  'source': '',
-    #  'dest': ''}
 ]
 
 
@@ -58,6 +61,11 @@ class ProgramError(Exception):
     def __init__(self, *args: object, critical) -> None:
         super().__init__(*args)
         self.critical = critical
+
+
+class CommandError(Exception):
+    def __init__(self, *args: object) -> None:
+        super().__init__(*args)
 
 
 class ErroEngine(Exception):
@@ -78,7 +86,7 @@ class Controller(Machine):
                          transitions=transitions, initial='inicial', name="EngineDoJogo")
 
     def executar_comando(self, comando: str, alvo):
-        self.trigger(comando, kwargs=alvo)
+        self.trigger(comando, alvo=alvo)
 
     def mover(self, **kwargs):
         """
@@ -94,10 +102,11 @@ class Controller(Machine):
         print("Comandos: usar, olhar, pegar, andar, mover, inventario, ajuda")
         print("USO: usar <nome do item>")
         print("USO: pegar <nome do item>")
+        print("USO: soltar <nome do item>")
         print("USO: olhar mostra a sala atual")
         print("USO: mover <nome do item>")
         print("USO: andar direcao(norte, sul, leste, oeste e derivados)")
-        print("USO: inventario: mostra inventario")
+        print("USO: itens: mostra inventario")
         print("USO: ajuda: pede ajuda pro computador")
 
     def desc_inicial(self):
@@ -107,21 +116,15 @@ class Controller(Machine):
         nome = sala["name"]
         self.printer.print_inicial([nome, desc])
 
-    def interacao(self, comando: str, id_alvo):
-        """
-        Helper pras funcoes de USAR PEGAR e MOVER
-        """
-        # mapeamento de comando para funcao de dados do manipulador
-        dict_cmd = {"pegar": self.manipulador.add_inventario,
-                    "mover": self.manipulador.mover_item,
-                    "usar": self.manipulador.usar_item
-                    }
-        if comando == "pegar":
-            pass
-        elif comando == "usar":
-            pass
-        elif comando == "mover":
-            pass
+    def olhar(self, **kwargs):
+        sala = self.manipulador.get_sala()
+        desc = sala.get("description")
+        name = sala.get("name")
+        itens = sala.get("items")
+        npcs = sala.get("npcs")
+        enemies = sala.get("enemies")
+        self.printer.print_olhar(desc=desc, name=name,
+                                 itens=itens, npcs=npcs, enemies=enemies)
 
     def pegar(self, **kwargs):
         """
@@ -131,75 +134,76 @@ class Controller(Machine):
         Returns:\n
         """
         # nome do objeto
-        alvo = kwargs.get("alvo", None)
-        falha = False
-        dict_falhas = {1: "ERRO NO PROGRAMA! Reinicie",
-                       2: "Item nao existe!",
-                       3: "Inventario cheio!"}
+        nome_item = kwargs.get("alvo", None)
+        try:
+            if nome_item == None:
+                # deu alguma merda grande
+                raise ProgramError("ERRO NO PROGRAMA! Reinicie", critical=True)
 
-        if alvo != None:
             sala = self.manipulador.get_sala()
-            id_alvo = self.manipulador.hash_reverso(sala["items"], "id", alvo)
-            if id_alvo != None:
-                resp = self.manipulador.add_inventario(sala, id_alvo)
-                if resp == False:
-                    # nao deu pra botar
-                    falha = 3
-            else:
-                # nao achou alvo
-                falha = 2
-        else:
-            # deu alguma merda muito grande pra isso
-            falha = 1
+            id_alvo, indice_item = self.manipulador.hash_reverso(
+                sala["items"], "id", "name", nome_item)
+            can_take = bool(sala["items"][indice_item]["can_take"])
 
-        # logica final de retorno
-        if falha:
-            return dict_falhas[falha]
-        else:
+            if id_alvo == None:
+                # nao achou alvo
+                raise CommandError("Item nao existe!")
+            elif can_take is False:
+                raise InventoryError("Item nao pode ser pegado")
+
+            resp = self.manipulador.add_inventario(
+                sala, id_alvo, nome_item, indice_item)
             return True
 
-    def pegar(self, **kwargs):
+        except ProgramError as e:
+            print(e.args[0])
+            if e.critical == True:
+                exit(1)
+        except CommandError as e:
+            print(e.args[0])
+        except InventoryError as e:
+            print(e.args[0])
+
+    def soltar(self, **kwargs):
         """
-        Recebe alvo e tenta adicionar alvo ao inventario\n
+        Solta item na sala atual\n
         NOTE: alvo deve ser NOME do objeto\n
         ------------\n
         Returns:\n
         """
         # nome do objeto
-        alvo = kwargs.get("alvo", None)
-        falha = False
-        dict_falhas = {2: "Item nao existe!", 3: "Inventario cheio!"}
+        nome_item = kwargs.get("alvo", None)
         try:
-            if alvo == None:
+            if nome_item == None:
+                # deu alguma merda grande
                 raise ProgramError("ERRO NO PROGRAMA! Reinicie", critical=True)
-            else:
-                sala = self.manipulador.get_sala()
-                id_alvo = self.manipulador.hash_reverso(
-                    sala["items"], "id", alvo)
-                if id_alvo != None:
-                    resp = self.manipulador.add_inventario(sala, id_alvo)
-                else:
-                    # nao achou alvo
-                    falha = 2
 
-            # logica final de retorno
-            if falha:
-                return dict_falhas[falha]
-            else:
-                return True
+            inv = self.manipulador.get_itens()
+
+            instancia_item = {}
+            achou = False
+            idx_item = 0
+            for i, item in enumerate(inv):
+                nome = item["name"]
+                if nome == nome_item:
+                    instancia_item = item
+                    idx_item = i
+                    achou = True
+                    break
+
+            if not achou:
+                raise CommandError("Item nao esta no inventario!")
+            self.manipulador.soltar_item(instancia_item, idx_item)
+            return True
 
         except ProgramError as e:
+            print(e.args[0])
             if e.critical == True:
                 exit(1)
-
-        except InventoryError:
-            print(1)
-
-        except MoveError:
-            print(2)
-
-        except InteractionError:
-            print(3)
+        except CommandError as e:
+            print(e.args[0])
+        except InventoryError as e:
+            print(e.args[0])
 
     def usar(self, **kwargs):
         nome_item = kwargs.get("alvo", None)
@@ -210,11 +214,16 @@ class Controller(Machine):
                        3: "Inventario cheio!"}
         if nome_item != None:
             sala = self.manipulador.get_sala()
-            id_alvo = self.manipulador.hash_reverso(
-                sala["items"], "id", nome_item)
+            id_alvo, indice_item = self.manipulador.hash_reverso(
+                sala["items"], "id", "name", nome_item)
 
-    def error_handler(self, error):
-        pass
+    def mostrarInventario(self, **kwargs):
+        itens = self.manipulador.get_itens()
+        itens = [item["name"] for item in itens]
+        if len(itens) == 0:
+            print("Invetario vazio")
+            return
+        self.printer.print_inventario(itens)
 
     def not_end(self):
         return self.state != "end"

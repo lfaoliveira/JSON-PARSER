@@ -30,6 +30,13 @@
                     "description": "Uma espada brilhante",
                     "can_take": true,
                     "inactive": false
+                },
+                {
+                    "id": "item1",
+                    "name": "Espada",
+                    "description": "Uma espada brilhante",
+                    "can_take": true,
+                    "inactive": false
                 }
             ],
             "npcs": [

@@ -5,8 +5,8 @@ from controller import Controller
 
 
 dict_erro_comandos = {
-    -1: "Comando inexistente",
-    -2: "Comando inexistente",
+    -1: "Comando errado",
+    -2: "Comando errado",
     -3: "Palavras nao sao comandos!"}
 
 # main
