@@ -1,0 +1,7 @@
+olhar
+pegar Espada
+itens
+soltar Espada
+itens
+olhar
+andar norte

@@ -22,7 +22,8 @@ transitions = [
      'after': 'desc_inicial'},
     {'trigger': 'andar',  # andar
      'source': 'esperando',
-     'dest': 'andando'},
+     'dest': '=',
+     'after': 'andar'},
     {'trigger': 'itens',  # inventario
      'source': 'esperando',
      'dest': '=',
@@ -126,6 +127,39 @@ class Controller(Machine):
         self.printer.print_olhar(desc=desc, name=name,
                                  itens=itens, npcs=npcs, enemies=enemies)
 
+    def andar(self, **kwargs):
+        """
+        Anda na direcao especificada pelo alvo\n
+        NOTE: alvo deve ser NOME da direcao\n
+        ------------\n
+        Returns:\n
+        """
+        nome_direcao = kwargs.get("alvo", None)
+        try:
+            if nome_direcao == None:
+                # deu alguma merda grande
+                raise ProgramError("ERRO NO PROGRAMA! Reinicie", critical=True)
+
+            sala = self.manipulador.get_sala()
+            id_exit, indice_item = self.manipulador.busca_dupla(
+                sala["exits"], "targetLocationId", "direction", nome_direcao)
+
+            if id_exit == None:
+                # nao achou alvo
+                raise CommandError("Saída nao existe!")
+            inactive = bool(sala["exits"][indice_item]["inactive"])
+            if inactive:
+                raise CommandError(
+                    "Saída indisponivel! Explore mais para conseguir sair")
+            self.manipulador.mudar_sala(str(id_exit))
+
+        except ProgramError as e:
+            print(e.args[0])
+            if e.critical == True:
+                exit(1)
+        except CommandError as e:
+            print(e.args[0])
+
     def pegar(self, **kwargs):
         """
         Recebe alvo e tenta adicionar alvo ao inventario\n
@@ -141,7 +175,7 @@ class Controller(Machine):
                 raise ProgramError("ERRO NO PROGRAMA! Reinicie", critical=True)
 
             sala = self.manipulador.get_sala()
-            id_alvo, indice_item = self.manipulador.hash_reverso(
+            id_alvo, indice_item = self.manipulador.busca_dupla(
                 sala["items"], "id", "name", nome_item)
             can_take = bool(sala["items"][indice_item]["can_take"])
 
@@ -193,6 +227,7 @@ class Controller(Machine):
 
             if not achou:
                 raise CommandError("Item nao esta no inventario!")
+
             self.manipulador.soltar_item(instancia_item, idx_item)
             return True
 
@@ -205,6 +240,7 @@ class Controller(Machine):
         except InventoryError as e:
             print(e.args[0])
 
+    # TODO: CONSTRUIR LOGICA DE USAR
     def usar(self, **kwargs):
         nome_item = kwargs.get("alvo", None)
 
@@ -214,7 +250,7 @@ class Controller(Machine):
                        3: "Inventario cheio!"}
         if nome_item != None:
             sala = self.manipulador.get_sala()
-            id_alvo, indice_item = self.manipulador.hash_reverso(
+            id_alvo, indice_item = self.manipulador.busca_dupla(
                 sala["items"], "id", "name", nome_item)
 
     def mostrarInventario(self, **kwargs):

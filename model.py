@@ -69,7 +69,7 @@ class DataManipulator:
         """funcao para pegar dados normalmente"""
         return self.dict_data[arg]
 
-    def hash_reverso(self, lista: list[dict], prop_alvo: str, prop_chave: str, value):
+    def busca_dupla(self, lista: list[dict[str, str]], prop_alvo: str, prop_chave: str, value):
         """
         Implementa logica de hash reverso para buscar dentro de objetos
         """
@@ -85,11 +85,12 @@ class DataManipulator:
         """
         return self.loc[int(self.sala_atual)]
 
-    def mudar_sala(self, alvo: str) -> dict:
+    def mudar_sala(self, id_alvo: str) -> dict:
         """
         Muda de objeto sala
+        NOTE: considera id da sala como numerico
         """
-        self.sala_atual = alvo
+        self.sala_atual = id_alvo
         return self.loc[int(self.sala_atual)]
 
     def parse_input(self, in_: str):
@@ -101,7 +102,7 @@ class DataManipulator:
         COMANDOS_1 = ["olhar", "itens", "ajuda"]
         COMANDOS_2 = ["usar", "pegar", "soltar", "andar", "mover"]
 
-        sequencia_str = re.split(r"\s|;|,", in_)
+        sequencia_str = re.split(r"\s|;|,", in_.lower())
         tam_seq = len(sequencia_str)
         if tam_seq == 1:
             comando = sequencia_str[0]

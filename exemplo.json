@@ -17,9 +17,15 @@
             "description": "Voce se encontra em um mundo maluco em que um velho semi-calvo fala enigmas sem sentido",
             "exits": [
                 {
-                    "direction": "north",
+                    "direction": "norte",
                     "targetLocationId": "1",
                     "description": "Um caminho para o norte",
+                    "inactive": false
+                },
+                {
+                    "direction": "oeste",
+                    "targetLocationId": "2",
+                    "description": "Um caminho para o oeste",
                     "inactive": false
                 }
             ],
@@ -66,7 +72,7 @@
                     "description": "Um enigma complicado",
                     "solution": {
                         "requiredItems": ["item1"],
-                        "actions": "usar"
+                        "actions": [ "usar"]
                     },
                     "result": {
                         "active": ["puzzle1"],
@@ -125,7 +131,7 @@
                     "description": "Um enigma da floresta",
                     "solution": {
                         "requiredItems": ["item2"],
-                        "actions": "usar"
+                        "actions": [ "usar"]
                     },
                     "result": {
                         "active": ["puzzle2"],
@@ -194,7 +200,7 @@
                     "description": "Um enigma da montanha",
                     "solution": {
                         "requiredItems": ["item3"],
-                        "actions": "usar"
+                        "actions": ["usar"]
                     },
                     "result": {
                         "active": ["puzzle3"],
