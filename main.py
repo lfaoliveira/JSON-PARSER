@@ -15,13 +15,12 @@ if __name__ == "__main__":
     path_dataset = os.getcwd()
     filename = "exemplo.json"
     # modelo pega todos os atributos do JSON
-
     model = DataManipulator(path_dataset, filename)
-
+    # faz parte de printagem, mas nem sempre
     printer = View(model)
+    # implementacao da logica da aplicacao
     ctrl = Controller(model, printer)
     ctrl.trigger("iniciarjogo")
-
     while ctrl.not_end():
         if model.turnos != None:
             print("Turnos Restantes: ", model.max_turnos - model.turnos)

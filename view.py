@@ -22,11 +22,10 @@ class View:
         separator = "#" * 30
         print(self.tab + separator)
 
-        self.print_with_formatting(f"Titulo: {self.title}", "\n\n")
-        self.print_with_formatting("#")
-        self.print_with_formatting("#")
+        self.print_with_formatting(f"\tTitulo: {self.title}", "\n\n")
+        self.print_with_formatting("")
         self.print_with_formatting(
-            f"Escreva 'ajuda' para ver os comandos ou sair para sair do jogo")
+            f"Escreva 'ajuda' para ver os comandos ou 'sair' para sair do jogo", newline="\n\n")
         self.print_with_formatting(f"Descrição do Jogo: {self.desc}")
         self.print_with_formatting(f"Criado por: {self.author}")
         self.print_with_formatting(f"Local: {local_inicial[0]}", "\n")

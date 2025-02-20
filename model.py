@@ -22,11 +22,6 @@ class InteractionError(DataError):
         super().__init__(*args)
 
 
-class MoveError(DataError):
-    def __init__(self, *args: object) -> None:
-        super().__init__(*args)
-
-
 class DataManipulator:
     def __init__(self, path_dataset, filename):
         self.dict_data = self.pegar_JSON(path_dataset, filename)
@@ -172,7 +167,7 @@ class DataManipulator:
         """
 
         COMANDOS_1 = ["olhar", "itens", "ajuda"]
-        COMANDOS_2 = ["usar", "pegar", "soltar", "andar", "mover"]
+        COMANDOS_2 = ["usar", "pegar", "falar", "soltar", "andar", "mover"]
 
         sequencia_str = re.split(r"\s|;|,", in_)
         tam_seq = len(sequencia_str)

@@ -5,7 +5,7 @@ import re
 from os import system
 from os.path import exists
 from click import getchar
-from model import DataManipulator, InventoryError, InteractionError, MoveError
+from model import DataManipulator, InventoryError, InteractionError
 from view import View
 from transitions import Machine
 from transitions import Transition
@@ -37,25 +37,28 @@ transitions = [
      'source': 'esperando',
      'dest': '=',
      'after': 'mostrar_ajuda'},
-    {'trigger': 'mover',  # mover , 'dados': "id_item, direcao"
+    {'trigger': 'mover',  # mover , 'dados': "nome_item, direcao"
      'source': 'esperando',
      'dest': '=',
      'after': 'moverObj'},
-    {'trigger': 'pegar',  # pegar 'dados': 'id_item'
+    {'trigger': 'pegar',  # pegar 'dados': 'nome_item'
      'source': 'esperando',
      'dest': '=',
      'after': 'pegar'},
-    {'trigger': 'soltar',  # soltar 'dados': 'id_item'
+    {'trigger': 'soltar',  # soltar 'dados': 'nome_item'
      'source': 'esperando',
      'dest': '=',
      'after': 'soltar'},
-    {'trigger': 'usar',  # usar 'dados': 'id_item'
+    {'trigger': 'usar',  # usar 'dados': 'nome_item'
      'source': 'esperando',
      'dest': '=',
      'after': 'usar'},
-    {'trigger': 'atacar',  # atacar 'dados': 'id_enemy'
+    {'trigger': 'atacar',  # atacar 'dados': 'nome_enemy'
      'source': 'esperando',
      'dest': 'atacando'},
+    {'trigger': 'falar',  # falar 'dados': 'nome_npc'
+     'source': 'esperando',
+     'dest': '='},
     {'trigger': 'endgame',  # fim de jogo 'dados': 'id_enemy'
      'source': 'esperando',
      'dest': 'end'},
@@ -69,11 +72,6 @@ class ProgramError(Exception):
 
 
 class CommandError(Exception):
-    def __init__(self, *args: object) -> None:
-        super().__init__(*args)
-
-
-class ErroEngine(Exception):
     def __init__(self, *args: object) -> None:
         super().__init__(*args)
 
@@ -107,11 +105,12 @@ class Controller(Machine):
 
     def mostrar_ajuda(self, **kwargs):
         print("COMO JOGAR: \n")
-        print("Comandos: usar, olhar, pegar, andar, mover, inventario, ajuda")
+        print("Comandos: usar, olhar, pegar, andar, falar, mover, inventario, ajuda")
         print("USO: usar <nome do item>")
         print("USO: pegar <nome do item>")
         print("USO: soltar <nome do item>")
         print("USO: olhar mostra a sala atual")
+        print("USO: falar <nome do personagem>")
         print("USO: mover <nome do item>")
         print("USO: andar direcao(norte, sul, leste, oeste e derivados)")
         print("USO: itens: mostra inventario")
@@ -123,6 +122,38 @@ class Controller(Machine):
         desc = sala["description"]
         nome = sala["name"]
         self.printer.print_inicial([nome, desc])
+
+    def falar(self, **kwargs):
+        """
+        Anda na direcao especificada pelo alvo\n
+        NOTE: alvo deve ser NOME da direcao\n
+        ---
+        ### Returns:
+        """
+        nome_npc = kwargs.get("alvo", None)
+        try:
+            if nome_npc == None:
+                # deu alguma merda grande
+                raise ProgramError("ERRO NO PROGRAMA! Reinicie", critical=True)
+
+            sala = self.manipulador.get_sala()
+            id_npc, indice_npc = self.manipulador.busca_dupla(
+                sala["npcs"], "id", "name", nome_npc)
+
+            if id_npc == None:
+                # nao achou alvo
+                raise CommandError("Saída nao existe!")
+            inactive = bool(sala["npcs"][indice_npc]["inactive"])
+            if inactive:
+                raise CommandError(
+                    "Personagem bloqueado! Explore mais para conseguir falar")
+
+        except ProgramError as e:
+            print(e.args[0])
+            if e.critical == True:
+                exit(1)
+        except CommandError as e:
+            print(e.args[0])
 
     def olhar(self, **kwargs):
         sala = self.manipulador.get_sala()
@@ -140,8 +171,8 @@ class Controller(Machine):
         """
         Anda na direcao especificada pelo alvo\n
         NOTE: alvo deve ser NOME da direcao\n
-        ------------\n
-        Returns:\n
+        ---
+        ### Returns:\n
         """
         nome_direcao = kwargs.get("alvo", None)
         try:
