@@ -23,5 +23,5 @@ if __name__ == "__main__":
         comando, alvo = model.parse_input(input(">>> "))
         if type(comando) == int:
             printer.print_erro(comando, dict_erro_comandos)
-        else:
+        elif (type(comando) == str):
             ctrl.executar_comando(comando, alvo)

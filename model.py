@@ -7,6 +7,26 @@ ATRIB_OPCIONAIS = ["max_itens", "max_turns_easy",
                    "max_turns_normal", "max_turns_hard"]
 
 
+class DataError(Exception):
+    def __init__(self, *args: object) -> None:
+        super().__init__(*args)
+
+
+class InventoryError(DataError):
+    def __init__(self, *args: object) -> None:
+        super().__init__(*args)
+
+
+class InteractionError(DataError):
+    def __init__(self, *args: object) -> None:
+        super().__init__(*args)
+
+
+class MoveError(DataError):
+    def __init__(self, *args: object) -> None:
+        super().__init__(*args)
+
+
 class DataManipulator:
     def __init__(self, path_dataset, filename):
         self.dict_data = self.pegar_JSON(path_dataset, filename)
@@ -48,6 +68,15 @@ class DataManipulator:
         """funcao para pegar dados normalmente"""
         return self.dict_data[arg]
 
+    def hash_reverso(self, obj, prop, value):
+        """
+        Implementa logica de hash reverso para buscar dentro de objetos
+        """
+        for key, elem in obj.items():
+            if elem[prop] == value:
+                return key
+        return None
+
     def get_sala(self) -> dict:
         """
         Retorna objeto sala
@@ -80,7 +109,7 @@ class DataManipulator:
         elif (tam_seq == 2):
             comando = sequencia_str[0]
             if comando in ["usar", "pegar", "andar", "mover"]:
-                alvo = sequencia_str[1]
+                alvo = str(sequencia_str[1])
                 return [comando, alvo]
             else:
                 # comando de 2 palavras errado
@@ -102,15 +131,11 @@ class DataManipulator:
             if len(self.itens) < self.max_itens:
                 self.itens.append(id_alvo)
             else:
-                return False
+                raise InventoryError("Inventario cheio!")
         return True
 
-    def hash_reverso(self, obj, prop, value):
-        """
-        Implementa logica de hash reverso para buscar dentro de objetos
-        """
-        for key, elem in obj.items():
-            if elem[prop] == value:
-                return key
+    def mover_item(self, sala: dict, id_alvo, id_destino):
+        pass
 
-        return None
+    def usar_item(self, sala: dict, id_item, efeito):
+        pass

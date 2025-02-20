@@ -44,7 +44,7 @@
                             "responses": [
                                 {
                                     "result": {
-                                        "active": ["npc1"],
+                                        "active": ["npc2"],
                                         "lose_item": []
                                     }
                                 }
@@ -103,7 +103,7 @@
                             "responses": [
                                 {
                                     "result": {
-                                        "active": ["npc2"],
+                                        "active": ["npc3"],
                                         "lose_item": []
                                     }
                                 }
@@ -172,7 +172,7 @@
                             "responses": [
                                 {
                                     "result": {
-                                        "active": ["npc3"],
+                                        "active": ["loc1"],
                                         "lose_item": []
                                     }
                                 }
