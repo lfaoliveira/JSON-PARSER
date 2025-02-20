@@ -1,6 +1,7 @@
 import json
 import copy
 import sys
+import re
 from os import system
 from os.path import exists
 from click import getchar
@@ -55,6 +56,9 @@ transitions = [
     {'trigger': 'atacar',  # atacar 'dados': 'id_enemy'
      'source': 'esperando',
      'dest': 'atacando'},
+    {'trigger': 'endgame',  # fim de jogo 'dados': 'id_enemy'
+     'source': 'esperando',
+     'dest': 'end'},
 ]
 
 
@@ -87,6 +91,9 @@ class Controller(Machine):
                          transitions=transitions, initial='inicial', name="EngineDoJogo")
 
     def executar_comando(self, comando: str, alvo):
+        end = self.manipulador.contar_turnos()
+        if end:
+            self.trigger('endgame')
         self.trigger(comando, alvo=alvo)
 
     def mover(self, **kwargs):
@@ -124,8 +131,10 @@ class Controller(Machine):
         itens = sala.get("items")
         npcs = sala.get("npcs")
         enemies = sala.get("enemies")
+        exits = sala.get("exits")
+
         self.printer.print_olhar(desc=desc, name=name,
-                                 itens=itens, npcs=npcs, enemies=enemies)
+                                 itens=itens, npcs=npcs, enemies=enemies, exits=exits)
 
     def andar(self, **kwargs):
         """
@@ -177,12 +186,12 @@ class Controller(Machine):
             sala = self.manipulador.get_sala()
             id_alvo, indice_item = self.manipulador.busca_dupla(
                 sala["items"], "id", "name", nome_item)
-            can_take = bool(sala["items"][indice_item]["can_take"])
 
             if id_alvo == None:
                 # nao achou alvo
                 raise CommandError("Item nao existe!")
-            elif can_take is False:
+            can_take = bool(sala["items"][indice_item]["can_take"])
+            if can_take is False:
                 raise InventoryError("Item nao pode ser pegado")
 
             resp = self.manipulador.add_inventario(

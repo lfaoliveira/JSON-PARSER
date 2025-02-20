@@ -47,6 +47,46 @@ class DataManipulator:
             self.dict_data.get("max_turns_normal", None))
         self.max_turns_hard = int(self.dict_data.get("max_turns_hard", None))
 
+        escolha = self.escolher_dificuldade()
+        if escolha != None:
+            tur, dif = escolha
+            print(dif)
+            self.dificuldade = dif
+            self.max_turnos = tur
+            self.turnos = 0
+        else:
+            self.turnos = None
+
+    def escolher_dificuldade(self):
+
+        easy = self.max_turns_easy
+        med = self.max_turns_normal
+        hard = self.max_turns_hard
+
+        difs = [(easy, "facil"), (med, "normal"), (hard, "dificil")]
+        # so fica que nao eh None
+        difs = list(filter(lambda x: x[0] != None, difs))
+        if len(difs) == 0:
+            return None
+        elif (len(difs) == 1):
+            return difs[0]
+
+        nums = [i + 1 for i in range(len(difs))]
+
+        print("Escolha um número de dificuldade: ")
+        for i, dif in enumerate(difs):
+            print(f"{i+1}- {dif[1]}: {dif[0]} Turnos")
+
+        a = input(">>> ")
+        match = re.match(f'[{nums[0]}-{nums[-1]}]', a)
+        while (match == None):
+            print("Insira um número válido! ")
+            a = input(">>> ")
+            match = re.match(f'[{nums[0]}-{nums[-1]}]', a)
+
+        idx = int(match.string) - 1
+        return difs[idx]
+
     def pegar_JSON(self, path_dataset: str, filename: str) -> dict:
         """
         Lê JSON e retorna dict
@@ -57,6 +97,19 @@ class DataManipulator:
             # dados retornados como dict
             # print(f"JSON: {data}\n\n")
             return data
+
+    def contar_turnos(self):
+        """
+        Conta turnos; se houver, retorna true se passar de max_turns senao retorna falso
+        """
+        end = False
+        if self.turnos != None:
+            self.turnos += 1
+            if self.turnos == self.max_turnos:
+                end = True
+                return end
+
+        return end
 
     def get_data_rec(self, args: list):
         """funcao para pegar propriedades de objetos recursivamente"""
@@ -102,10 +155,11 @@ class DataManipulator:
         COMANDOS_1 = ["olhar", "itens", "ajuda"]
         COMANDOS_2 = ["usar", "pegar", "soltar", "andar", "mover"]
 
-        sequencia_str = re.split(r"\s|;|,", in_.lower())
+        sequencia_str = re.split(r"\s|;|,", in_)
         tam_seq = len(sequencia_str)
+        comando = sequencia_str[0].lower()
         if tam_seq == 1:
-            comando = sequencia_str[0]
+
             if comando in COMANDOS_1:
                 return [comando, ""]
             elif comando == "sair":
@@ -114,7 +168,7 @@ class DataManipulator:
                 # comando de 1 palavra errado
                 return [-1, -1]
         elif tam_seq == 2:
-            comando = sequencia_str[0]
+
             if comando in COMANDOS_2:
                 alvo = str(sequencia_str[1])
                 return [comando, alvo]

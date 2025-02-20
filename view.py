@@ -50,7 +50,6 @@ class View:
             self.print_with_formatting(elem)
 
         self.trail = ""
-        print("")
 
     def print_inventario(self, itens: list[str]):
         print("Inventario: ", end=" ")
@@ -65,14 +64,19 @@ class View:
 
         npcs = [
             f"{npc['name']}: {npc['description']}" for npc in npcs]
-        npcs = [elem.encode("utf-16").decode("utf-16") for elem in npcs]
         enemies = kwargs.get("enemies", [])
+        exits = kwargs.get("exits", [])
+        exits = [
+            f"{saida['description']}: {saida['direction']} - Inativo: {saida['inactive']}" for saida in exits
+        ]
 
         self.print_with_formatting(f"{name}: {desc}")
         self.print_with_formatting(f"Itens:")
         self.print_elems(itens)
         self.print_with_formatting(f"Personagens:")
         self.print_elems(npcs)
+        self.print_with_formatting("Saídas: ")
+        self.print_elems(exits)
         self.print_with_formatting(f"Inimigos: {enemies}")
 
     def print_erro(self, num_erro: int, dict_erro: dict):
