@@ -48,8 +48,8 @@
             "npcs": [
                 {
                     "id": "npc1",
-                    "name": "Velho Sábio",
-                    "description": "Um velho sábio que fala enigmas",
+                    "name": "Velho Sabio",
+                    "description": "Um velho sabio que fala enigmas",
                     "inactive": false,
                     "dialogues": [
                         {
@@ -112,7 +112,7 @@
                     "inactive": false,
                     "dialogues": [
                         {
-                            "text": "Você pode me ajudar a encontrar meu caminho?",
+                            "text": "Voce pode me ajudar a encontrar meu caminho?",
                             "responses": [
                                 {
                                     "result": {
@@ -167,8 +167,8 @@
             "items": [
                 {
                     "id": "item3",
-                    "name": "Poção",
-                    "description": "Uma poção de cura",
+                    "name": "Pocao",
+                    "description": "Uma pocao de cura",
                     "can_take": true,
                     "inactive": false
                 }
@@ -181,7 +181,7 @@
                     "inactive": false,
                     "dialogues": [
                         {
-                            "text": "Eu posso te ajudar, mas a um preço.",
+                            "text": "Eu posso te ajudar, mas a um preco.",
                             "responses": [
                                 {
                                     "result": {

@@ -2,19 +2,16 @@ import json
 import copy
 import sys
 import re
-from os import system
-from os.path import exists
+import os
 from click import getchar
-from model import DataManipulator, InventoryError, InteractionError
+from model import DataManipulator, InventoryError
 from view import View
 from transitions import Machine
-from transitions import Transition
 
 # inspiracao: https://github.com/acm-0/AdventureGame
 
-estados = ['inicial', 'esperando', 'movendo', 'pegando',
-           'largando', 'atacando', 'interagindo',
-           'dialogando', 'executando', 'andando', 'defendendo', 'end']
+estados = ['inicial', 'esperando',
+           'atacando', 'dialogando', 'end']
 
 transitions = [
     {'trigger': 'iniciarjogo',  # iniciarJogo
@@ -58,7 +55,8 @@ transitions = [
      'dest': 'atacando'},
     {'trigger': 'falar',  # falar 'dados': 'nome_npc'
      'source': 'esperando',
-     'dest': '='},
+     'dest': '=',
+     'after': 'falar'},
     {'trigger': 'endgame',  # fim de jogo 'dados': 'id_enemy'
      'source': 'esperando',
      'dest': 'end'},
@@ -92,29 +90,47 @@ class Controller(Machine):
         end = self.manipulador.contar_turnos()
         if end:
             self.trigger('endgame')
-        self.trigger(comando, alvo=alvo)
+        if comando != "falar":
+
+            self.trigger(comando, alvo=alvo)
+        else:
+            a = self.trigger("falar", alvo=alvo)
+            print("RETORNO TRIGGER: ", a)
 
     def mover(self, **kwargs):
         """
-        Recebe alvo e tenta adicionar alvo ao inventario\n
+        Movimenta item. Nao precisa especificar direcao\n
         NOTE: alvo deve ser NOME do objeto\n
         ------------\n
         Returns:\n
         """
-        pass
+        # TODO: MELHORAR LOGICA DE MOVER
+        # nome do objeto
+        nome_item = kwargs.get("alvo", None)
+        try:
+            if nome_item == None:
+                # deu alguma merda grande
+                raise ProgramError("ERRO NO PROGRAMA! Reinicie", critical=True)
+
+            sala = self.manipulador.get_sala()
+            id_alvo, indice_item = self.manipulador.busca_dupla(
+                sala["items"], "id", "name", nome_item)
+
+            if id_alvo == None:
+                # nao achou alvo
+                raise CommandError("Item nao existe!")
+
+            return True
+
+        except ProgramError as e:
+            print(e.args[0])
+            if e.critical == True:
+                exit(1)
+        except CommandError as e:
+            print(e.args[0])
 
     def mostrar_ajuda(self, **kwargs):
-        print("COMO JOGAR: \n")
-        print("Comandos: usar, olhar, pegar, andar, falar, mover, inventario, ajuda")
-        print("USO: usar <nome do item>")
-        print("USO: pegar <nome do item>")
-        print("USO: soltar <nome do item>")
-        print("USO: olhar mostra a sala atual")
-        print("USO: falar <nome do personagem>")
-        print("USO: mover <nome do item>")
-        print("USO: andar direcao(norte, sul, leste, oeste e derivados)")
-        print("USO: itens: mostra inventario")
-        print("USO: ajuda: pede ajuda pro computador")
+        self.printer.mostrar_ajuda()
 
     def desc_inicial(self):
         # considerando que locations eh lista ordenada
@@ -125,8 +141,8 @@ class Controller(Machine):
 
     def falar(self, **kwargs):
         """
-        Anda na direcao especificada pelo alvo\n
-        NOTE: alvo deve ser NOME da direcao\n
+        Fala com NPC especificado por alvo\n
+        NOTE: alvo deve ser NOME do NPC\n
         ---
         ### Returns:
         """
@@ -135,14 +151,14 @@ class Controller(Machine):
             if nome_npc == None:
                 # deu alguma merda grande
                 raise ProgramError("ERRO NO PROGRAMA! Reinicie", critical=True)
-
+            print("NOME DE INPUT: ", nome_npc)
             sala = self.manipulador.get_sala()
             id_npc, indice_npc = self.manipulador.busca_dupla(
                 sala["npcs"], "id", "name", nome_npc)
 
             if id_npc == None:
                 # nao achou alvo
-                raise CommandError("Saída nao existe!")
+                raise CommandError("NPC nao existe!")
             inactive = bool(sala["npcs"][indice_npc]["inactive"])
             if inactive:
                 raise CommandError(
@@ -280,18 +296,36 @@ class Controller(Machine):
         except InventoryError as e:
             print(e.args[0])
 
-    # TODO: CONSTRUIR LOGICA DE USAR
     def usar(self, **kwargs):
+        """
+        Usa alvo. Efetivamente nao faz nada, so serve pra registrar acao\n
+        NOTE: alvo deve ser NOME do objeto\n
+        ------------\n
+        Returns:\n
+        """
+        # nome do objeto
         nome_item = kwargs.get("alvo", None)
+        try:
+            if nome_item == None:
+                # deu alguma merda grande
+                raise ProgramError("ERRO NO PROGRAMA! Reinicie", critical=True)
 
-        falha = False
-        dict_falhas = {1: "ERRO NO PROGRAMA! Reinicie",
-                       2: "Item nao existe!",
-                       3: "Inventario cheio!"}
-        if nome_item != None:
             sala = self.manipulador.get_sala()
             id_alvo, indice_item = self.manipulador.busca_dupla(
                 sala["items"], "id", "name", nome_item)
+
+            if id_alvo == None:
+                # nao achou alvo
+                raise CommandError("Item nao existe!")
+
+            return True
+
+        except ProgramError as e:
+            print(e.args[0])
+            if e.critical == True:
+                exit(1)
+        except CommandError as e:
+            print(e.args[0])
 
     def mostrarInventario(self, **kwargs):
         itens = self.manipulador.get_itens()

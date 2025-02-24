@@ -31,6 +31,21 @@ class View:
         self.print_with_formatting(f"Local: {local_inicial[0]}", "\n")
         self.print_with_formatting(f"{local_inicial[1]}")
 
+    def mostrar_ajuda(self):
+        print("COMO JOGAR: \n")
+        print(
+            "Comandos: usar, olhar, pegar, andar, falar, atacar, mover, inventario, ajuda")
+        print("USO: usar <nome do item> - Exemplo: usar chave")
+        print("USO: pegar <nome do item> - Exemplo: pegar espada")
+        print("USO: soltar <nome do item> - Exemplo: soltar escudo")
+        print("USO: atacar <nome do inimigo> - Exemplo: atacar goblin")
+        print("USO: olhar mostra detalhes da sala atual")
+        print("USO: falar <nome do personagem> - Exemplo: falar aldeão")
+        print("USO: mover <nome do item> - Exemplo: mover pedra")
+        print("USO: andar <direcao> - Exemplo: andar norte")
+        print("USO: itens: mostra inventario")
+        print("USO: ajuda: pede ajuda pro PC")
+
     def print_with_formatting(self, content: str, newline: str = "\n"):
         formatted_str = f"{self.tab}{self.leading}{content}{self.trail}"
         print(formatted_str, end=newline)

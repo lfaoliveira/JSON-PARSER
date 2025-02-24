@@ -17,17 +17,18 @@ class InventoryError(DataError):
         super().__init__(*args)
 
 
-class InteractionError(DataError):
-    def __init__(self, *args: object) -> None:
-        super().__init__(*args)
-
-
 class DataManipulator:
     def __init__(self, path_dataset, filename):
         self.dict_data = self.pegar_JSON(path_dataset, filename)
         # acoes permitidas ao usuario
-        self.COMANDOS = ["usar", "olhar", "pegar", "andar",
-                         "mover", "itens", "ajuda", "soltar"]
+
+        # stats do usuario
+        self.attack = self.dict_data["attack"]
+        self.defense = self.dict_data["defense"]
+        self.life = self.dict_data["life"]
+
+        self.puzzles_resolv = []
+
         # localizacao
         self.loc = self.dict_data.get("locations", [])
         self.loc.sort(key=lambda x: int(x.get("id")))
@@ -41,6 +42,9 @@ class DataManipulator:
         self.max_turns_normal = int(
             self.dict_data.get("max_turns_normal", None))
         self.max_turns_hard = int(self.dict_data.get("max_turns_hard", None))
+
+        # array contendo acoes executadas na sala atual
+        self.acoes_atuais = []
 
         escolha = self.escolher_dificuldade()
         if escolha != None:
@@ -106,7 +110,7 @@ class DataManipulator:
         Lê JSON e retorna dict
         """
         path_json = os.path.join(path_dataset, filename)
-        with open(path_json, "r") as file:
+        with open(path_json, "r", encoding="utf-8") as file:
             data = json.load(file)
             # dados retornados como dict
             # print(f"JSON: {data}\n\n")
@@ -125,23 +129,42 @@ class DataManipulator:
 
         return end
 
-    def get_data_rec(self, args: list):
-        """funcao para pegar propriedades de objetos recursivamente"""
-        data = self.dict_data
-        for arg in args:
-            data = data[arg]
-        return data
-
     def get_data(self, arg):
         """funcao para pegar dados normalmente"""
         return self.dict_data[arg]
 
-    def busca_dupla(self, lista: list[dict[str, str]], prop_alvo: str, prop_chave: str, value):
+    def reg_acao(self, acao):
+        self.acoes_atuais.append(acao)
+
+    def proc_result(self, result: dict):
+        active = result["active"]
+        if len(active) > 0:
+            for elem in active:
+                self.puzzles_resolv.append(elem)
+
+        lose_life = int(result["lose_life"])
+        self.life -= lose_life
+
+        lose_item = result["lose_item"]
+        if len(lose_item) > 0:
+            for elem in lose_item:
+                self.inv.remove(elem)
+
+    def busca_dupla(self, lista: list[dict[str, str]], prop_alvo: str, prop_chave: str, valor_procurado):
         """
         Implementa logica de hash reverso para buscar dentro de objetos
         """
+        "falar velho sábio"
         for i, obj in enumerate(lista):
-            if obj[prop_chave] == value:
+            value = obj[prop_chave]
+            if type(value) == str and " " in value:
+                # troca espacos por _ e transforma em lowercase
+                value = value.replace(" ", "_").lower()
+                print("VALUE: ", value)
+                # valor_procurado = re.sub(r'\s+', '_', valor_procurado)
+                print("VALOR_PROCURADO: ", valor_procurado)
+                valor_procurado = valor_procurado.lower()
+            if value == valor_procurado:
                 return obj[prop_alvo], i
         return None, None
 
@@ -157,21 +180,25 @@ class DataManipulator:
         Muda de objeto sala
         NOTE: considera id da sala como numerico
         """
+        self.acoes_atuais = []
         self.sala_atual = id_alvo
         return self.loc[int(self.sala_atual)]
 
     def parse_input(self, in_: str):
         """
-        Faz parse do input, analisa se comandos estao corretos.
+        Faz parsing do input, analisa se comandos estao corretos.
         retorna inteiro para erro ou lista contendo comando ou comando e alvo
         """
+        # TODO: finalizar atacar
 
         COMANDOS_1 = ["olhar", "itens", "ajuda"]
-        COMANDOS_2 = ["usar", "pegar", "falar", "soltar", "andar", "mover"]
-
-        sequencia_str = re.split(r"\s|;|,", in_)
+        COMANDOS_2 = ["usar", "pegar", "falar",
+                      "soltar", "andar", "mover", "atacar"]
+        in_ = re.sub(r'\s+|;+|,+', '_',  in_)
+        sequencia_str = re.split(r"_", in_)
         tam_seq = len(sequencia_str)
         comando = sequencia_str[0].lower()
+
         if tam_seq == 1:
 
             if comando in COMANDOS_1:
@@ -181,10 +208,13 @@ class DataManipulator:
             else:
                 # comando de 1 palavra errado
                 return [-1, -1]
-        elif tam_seq == 2:
+        elif tam_seq >= 2:
 
             if comando in COMANDOS_2:
-                alvo = str(sequencia_str[1])
+                # alvo = str(sequencia_str[1])
+                # registra acao
+                self.reg_acao(comando)
+                alvo = "_".join(sequencia_str[1:])
                 return [comando, alvo]
             else:
                 # comando de 2 palavras errado
