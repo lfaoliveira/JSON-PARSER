@@ -100,7 +100,6 @@ class Controller(Machine):
         ------------\n
         Returns:\n
         """
-        # TODO: MELHORAR LOGICA DE MOVER
         # nome do objeto
         nome_item = kwargs.get("alvo", None)
         try:
@@ -115,7 +114,7 @@ class Controller(Machine):
             if id_alvo == None:
                 # nao achou alvo
                 raise CommandError("Item nao existe!")
-
+            print(f"Você moveu {nome_item}")
             return True
 
         except ProgramError as e:
@@ -195,7 +194,6 @@ class Controller(Machine):
 
             lose_item = resultado["lose_item"]
             if len(lose_item) > 0:
-                # TODO: CRIAR LOGICA DE EXCECOES
                 self.manipulador.perder_item(lose_item)
 
     def olhar(self, **kwargs):
@@ -235,7 +233,7 @@ class Controller(Machine):
                 raise CommandError(
                     "Saída indisponivel! Explore mais para conseguir sair")
             self.manipulador.mudar_sala(str(id_exit))
-
+            print(f"Você andou na direção {nome_direcao}")
         except ProgramError as e:
             print(e.args[0])
             if e.critical == True:
@@ -270,6 +268,7 @@ class Controller(Machine):
 
             resp = self.manipulador.add_inventario(
                 sala, id_alvo, nome_item, indice_item)
+            print(f"Você pegou {nome_item}")
             return True
 
         except ProgramError as e:
@@ -312,6 +311,8 @@ class Controller(Machine):
                 raise CommandError("Item nao esta no inventario!")
 
             self.manipulador.soltar_item(instancia_item, idx_item)
+            print(f"Você soltou {nome_item}")
+
             return True
 
         except ProgramError as e:
@@ -345,6 +346,7 @@ class Controller(Machine):
                 # nao achou alvo
                 raise CommandError("Item nao existe!")
 
+            print(f"Você usou {nome_item}")
             return True
 
         except ProgramError as e:

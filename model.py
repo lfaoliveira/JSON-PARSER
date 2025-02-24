@@ -21,8 +21,6 @@ class DataManipulator:
     def __init__(self, path_dataset, filename):
         self.dict_data = self.pegar_JSON(path_dataset, filename)
 
-        # TODO: criar logica de hashmaps pra todos os npcs de cada sala
-
         # stats do usuario
         self.attack = self.dict_data["attack"]
         self.defense = self.dict_data["defense"]
@@ -31,8 +29,31 @@ class DataManipulator:
         self.puzzles_resolv = []
 
         # localizacao
-        self.loc = self.dict_data.get("locations", [])
-        self.loc.sort(key=lambda x: int(x.get("id")))
+        self.loc = {}
+        aux = self.dict_data.get("locations", [])
+        for obj in aux:
+            self.loc[obj["id"]] = obj
+
+        # hashmaps reverso pra PUZZLES e NPC
+        self.npcs = {}  # key = id do npc; value= id da sala
+        self.puzzles = {}  # key = id do puzzle; value= id da sala
+        self.saidas = {}  # key = id da saida; value= id da sala
+        for id_sala, sala in self.loc.items():
+            puzzles = sala.get("puzzles", [])
+            for puzzle in puzzles:
+                id_p = puzzle["id"]
+                self.puzzles[id_p] = id_sala
+
+            npcs = sala.get("npcs", [])
+            for npc in npcs:
+                id_n = npc["id"]
+                self.npcs[id_n] = id_sala
+
+            saidas = sala.get("exits", [])
+            for saida in saidas:
+                id_s = saida["targetLocationId"]
+                self.saidas[id_s] = id_sala
+
         # id da sala atual
         self.sala_atual = self.dict_data["startLocationId"]
         # itens do usuario
@@ -58,8 +79,34 @@ class DataManipulator:
             self.turnos = None
 
     def activate_npc(self, lista_npc):
-        # TODO: criar logica de ativacao de npc
-        pass
+        for id_npc in lista_npc:
+            id_sala = self.npcs[id_npc]
+            sala = self.loc[id_sala]
+            npcs_outra_sala = sala["npcs"]
+            for npc in npcs_outra_sala:
+                if npc["id"] == id_npc:
+                    npc["inactive"] = False
+                    break
+
+    def activate_puzzle(self, lista_puzzle):
+        for id_puzzle in lista_puzzle:
+            id_sala = self.puzzles[id_puzzle]
+            sala = self.loc[id_sala]
+            puzzles_outra_sala = sala["puzzles"]
+            for puzzle in puzzles_outra_sala:
+                if puzzle["id"] == id_puzzle:
+                    puzzle["inactive"] = False
+                    break
+
+    def activate_saida(self, lista_saida):
+        for id_saida in lista_saida:
+            id_sala = self.npcs[id_saida]
+            sala = self.loc[id_sala]
+            saidas_outra_sala = sala["exits"]
+            for saida in saidas_outra_sala:
+                if saida["targetLocationId"] == id_saida:
+                    saida["inactive"] = False
+                    break
 
     def escolha(self, opcoes: dict[int, str]):
         """
@@ -182,7 +229,7 @@ class DataManipulator:
         Retorna objeto sala
         NOTE: considera id da sala como numerico
         """
-        return self.loc[int(self.sala_atual)]
+        return self.loc[self.sala_atual]
 
     def mudar_sala(self, id_alvo: str) -> dict:
         """
@@ -191,7 +238,7 @@ class DataManipulator:
         """
         self.acoes_atuais = []
         self.sala_atual = id_alvo
-        return self.loc[int(self.sala_atual)]
+        return self.get_sala()
 
     def parse_input(self, in_: str):
         """
@@ -203,7 +250,9 @@ class DataManipulator:
         COMANDOS_1 = ["olhar", "itens", "ajuda"]
         COMANDOS_2 = ["usar", "pegar", "falar",
                       "soltar", "andar", "mover", "atacar"]
+        # transforma espacos, ; e , em _
         in_ = re.sub(r'\s+|;+|,+', '_',  in_)
+        # faz split em cada underline
         sequencia_str = re.split(r"_", in_)
         tam_seq = len(sequencia_str)
         comando = sequencia_str[0].lower()
@@ -229,7 +278,7 @@ class DataManipulator:
                 # comando de 2 palavras errado
                 return [-2, -2]
         else:
-            # comando de 3 palavras, nao existe
+            # comando de 0 palavras, inexistente
             return [-3, -3]
 
     def get_itens(self) -> list[dict]:
