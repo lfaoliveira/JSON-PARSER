@@ -17,6 +17,22 @@ class InventoryError(DataError):
         super().__init__(*args)
 
 
+class Item:
+    def __init__(self, id, name, description, can_take, inactive) -> None:
+        self.id = id
+        self.name = name
+        self.description = description
+        self.can_take = can_take
+        self.inactive = inactive
+
+    def to_dict(self):
+        return {"id": self.id,
+                "name": self.name,
+                "description": self.description,
+                "can_take": self.can_take,
+                "inactive": self.inactive}
+
+
 class DataManipulator:
     def __init__(self, path_dataset, filename):
         self.dict_data = self.pegar_JSON(path_dataset, filename)
@@ -59,11 +75,10 @@ class DataManipulator:
         # itens do usuario
         self.inv = []
         # ATRIBUTOS OPCIONAIS
-        self.max_itens = int(self.dict_data.get("max_itens", None))
-        self.max_turns_easy = int(self.dict_data.get("max_turns_easy", None))
-        self.max_turns_normal = int(
-            self.dict_data.get("max_turns_normal", None))
-        self.max_turns_hard = int(self.dict_data.get("max_turns_hard", None))
+        self.max_itens = self.dict_data.get("max_itens", None)
+        self.max_turns_easy = self.dict_data.get("max_turns_easy", None)
+        self.max_turns_normal = self.dict_data.get("max_turns_normal", None)
+        self.max_turns_hard = self.dict_data.get("max_turns_hard", None)
 
         # array contendo acoes executadas na sala atual
         self.acoes_atuais = []
@@ -73,7 +88,7 @@ class DataManipulator:
             tur, dif = escolha
             print(dif)
             self.dificuldade = dif
-            self.max_turnos = tur
+            self.max_turnos = int(tur)
             self.turnos = 0
         else:
             self.turnos = None
@@ -85,6 +100,7 @@ class DataManipulator:
             npcs_outra_sala = sala["npcs"]
             for npc in npcs_outra_sala:
                 if npc["id"] == id_npc:
+                    print(f"{npc['name']} ativado!")
                     npc["inactive"] = False
                     break
 
@@ -120,13 +136,13 @@ class DataManipulator:
         Sempre retorna numero de escolha
         """
         nums = [i + 1 for i in range(len(opcoes.keys()))]
-        a = input("\t) ")
+        a = input(" :")
 
         # so aceita ate 9 escolhas
         match = re.match(f'[{nums[0]}-{nums[-1]}]', a)
         while (match == None):
             print("Insira um número válido! ")
-            a = input("\t) ")
+            a = input(" :")
             match = re.match(f'[{nums[0]}-{nums[-1]}]', a)
         string = re.split(f"([{nums[0]}-{nums[-1]}])", match.string)[1]
 
@@ -168,9 +184,13 @@ class DataManipulator:
             # print(f"JSON: {data}\n\n")
             return data
 
-    def perder_item(self, lista_itens):
-        for elem in lista_itens:
-            self.inv.remove(elem)
+    def perder_item(self, lista_itens: list[str]):
+        for id_item in lista_itens:
+            for elem in self.inv:
+                if elem.id == id_item:
+                    print(f"Item perdido: {elem.name}")
+                    self.inv.remove(elem)
+                    break
 
     def contar_turnos(self):
         """
@@ -216,9 +236,7 @@ class DataManipulator:
             if type(value) == str and " " in value:
                 # troca espacos por _ e transforma em lowercase
                 value = value.replace(" ", "_").lower()
-                print("VALUE: ", value)
                 # valor_procurado = re.sub(r'\s+', '_', valor_procurado)
-                print("VALOR_PROCURADO: ", valor_procurado)
                 valor_procurado = valor_procurado.lower()
             if value == valor_procurado:
                 return obj[prop_alvo], i
@@ -245,11 +263,11 @@ class DataManipulator:
         Faz parsing do input, analisa se comandos estao corretos.
         retorna inteiro para erro ou lista contendo comando ou comando e alvo
         """
-        # TODO: finalizar atacar
         # acoes permitidas ao usuario
         COMANDOS_1 = ["olhar", "itens", "ajuda"]
         COMANDOS_2 = ["usar", "pegar", "falar",
                       "soltar", "andar", "mover", "atacar"]
+
         # transforma espacos, ; e , em _
         in_ = re.sub(r'\s+|;+|,+', '_',  in_)
         # faz split em cada underline
@@ -281,7 +299,7 @@ class DataManipulator:
             # comando de 0 palavras, inexistente
             return [-3, -3]
 
-    def get_itens(self) -> list[dict]:
+    def get_itens(self) -> list[Item]:
         return self.inv
 
     def add_inventario(self, sala: dict, id_alvo: str, nome_alvo: str, idx_item):
@@ -294,20 +312,23 @@ class DataManipulator:
         sala = self.get_sala()
         lista_itens = sala["items"]
         dict_item = lista_itens[idx_item]
+        item_class = Item(dict_item["id"], dict_item["name"],
+                          dict_item["description"], dict_item["can_take"], dict_item["inactive"])
         if self.max_itens is None:
-            self.inv.append(dict_item)
+            self.inv.append(item_class)
         else:
             if len(self.inv) < self.max_itens:
-                self.inv.append(dict_item)
+                self.inv.append(item_class)
             else:
                 raise InventoryError("Inventario cheio!")
 
-        return sala["items"].pop(idx_item)
+        return
 
-    def soltar_item(self, dict_item, idx_item):
+    def soltar_item(self, item: Item, idx_item):
         sala = self.get_sala()
-        sala["items"].append(dict_item)
+        sala["items"].append(item.to_dict())
         self.inv.pop(idx_item)
+        return
 
     def mover_item(self, sala: dict, id_alvo, id_destino):
         pass

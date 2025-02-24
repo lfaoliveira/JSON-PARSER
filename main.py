@@ -23,7 +23,8 @@ if __name__ == "__main__":
     ctrl.trigger("iniciarjogo")
     while ctrl.not_end():
         if model.turnos != None:
-            print("Turnos Restantes: ", model.max_turnos - model.turnos)
+            rest = int(model.max_turnos) - model.turnos
+            print("Turnos Restantes: ", rest)
 
         comando, alvo = model.parse_input(input(">>> "))
         if type(comando) == int:

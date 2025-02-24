@@ -4,7 +4,7 @@ import sys
 import re
 import os
 from click import getchar
-from model import DataManipulator, InventoryError
+from model import DataManipulator, InventoryError, Item
 from view import View
 from transitions import Machine
 
@@ -37,7 +37,7 @@ transitions = [
     {'trigger': 'mover',  # mover , 'dados': "nome_item, direcao"
      'source': 'esperando',
      'dest': '=',
-     'after': 'moverObj'},
+     'after': 'mover'},
     {'trigger': 'pegar',  # pegar 'dados': 'nome_item'
      'source': 'esperando',
      'dest': '=',
@@ -52,7 +52,8 @@ transitions = [
      'after': 'usar'},
     {'trigger': 'atacar',  # atacar 'dados': 'nome_enemy'
      'source': 'esperando',
-     'dest': 'atacando'},
+     'dest': '=',
+     'after': 'atacar'},
     {'trigger': 'falar',  # falar 'dados': 'nome_npc'
      'source': 'esperando',
      'dest': '=',
@@ -87,9 +88,10 @@ class Controller(Machine):
                          transitions=transitions, initial='inicial', name="EngineDoJogo")
 
     def executar_comando(self, comando: str, alvo):
-        end = self.manipulador.contar_turnos()
-        if end:
-            self.trigger('endgame')
+        if comando != "olhar":
+            end = self.manipulador.contar_turnos()
+            if end:
+                self.trigger('endgame')
 
         self.trigger(comando, alvo=alvo)
 
@@ -134,6 +136,67 @@ class Controller(Machine):
         nome = sala["name"]
         self.printer.print_inicial([nome, desc])
 
+    def atacar(self, **kwargs):
+        """
+        Usa alvo. Efetivamente nao faz nada, so serve pra registrar acao\n
+        NOTE: alvo deve ser NOME do objeto\n
+        ------------\n
+        Returns:\n
+        """
+        def helper_atacar(manipulador: DataManipulator, ataque):
+            ataque_real = manipulador.defense - ataque
+            return ataque_real, ataque_real >= manipulador.life
+
+        # nome do objeto
+        nome_inimigo = kwargs.get("alvo", None)
+        try:
+            if nome_inimigo == None:
+                # deu alguma merda grande
+                raise ProgramError("ERRO NO PROGRAMA! Reinicie", critical=True)
+
+            sala = self.manipulador.get_sala()
+            inimigos = sala["enemies"]
+            if len(inimigos) == 0:
+                raise CommandError(
+                    "Nao ha inimigos nesta sala! Agressividade demais eh ruim")
+            # NOTE: SEMPRE ATACA PRIMEIRO INIMIGO
+            aux = inimigos[0]
+            id, name = aux.get("id", None), aux.get("name", None)
+            if id != None and name != None:
+                id_inimigo, indice_inimigo = self.manipulador.busca_dupla(
+                    sala["enemies"], "id", "name", nome_inimigo)
+
+                if id_inimigo == None:
+                    # nao achou alvo
+                    raise CommandError("Inimigo nao existe!")
+
+            ataque_ini = int(aux["attack"])
+            def_ini = int(aux["defense"])
+            ataque_real_ini, impossivel_vencer = helper_atacar(
+                self.manipulador, ataque_ini)
+            if impossivel_vencer:
+                raise CommandError(
+                    "Inimigo com ataque muito alto! pegue itens melhores")
+            else:
+                # hora de atacar
+                self.manipulador.life -= ataque_real_ini
+                if def_ini > self.manipulador.attack:
+                    raise CommandError(
+                        "Inimigo com defensa muita alta! pegue itens melhores")
+                else:
+                    # nao morreu com ataque e inimigo pode ser morto
+                    print(f"Você eliminou {nome_inimigo}")
+                    sala = self.manipulador.get_sala()
+                    sala["enemies"].remove(aux)
+                    return True
+
+        except ProgramError as e:
+            print(e.args[0])
+            if e.critical == True:
+                exit(1)
+        except CommandError as e:
+            print(e.args[0])
+
     def falar(self, **kwargs):
         """
         Fala com NPC especificado por alvo\n
@@ -158,7 +221,7 @@ class Controller(Machine):
             inactive = bool(sala["npcs"][indice_npc]["inactive"])
             if inactive:
                 raise CommandError(
-                    "Personagem bloqueado! Explore mais para conseguir falar")
+                    "Personagem bloqueado! Explore mais")
 
         except ProgramError as e:
             print(e.args[0])
@@ -170,31 +233,31 @@ class Controller(Machine):
             return
 
         diags = sala["npcs"][indice_npc]["dialogues"]
+        self.printer.print_with_formatting("DIALOGO: ")
+
         opcoes = {}
-        cont = 0
+        i = 0
 
-        for i in range(1, len(diags) + 1):
+        for i in range(len(diags)):
             opcoes[i] = diags[i]["text"]
-            cont += 1
-        opcoes[cont + 1] = "Sair do dialogo"
+            print(f"{i + 1}) {diags[i]['text']}")
+        opcoes[i + 1] = "Sair do dialogo"
 
-        loop = True
-        while loop:
-            idx = int(self.manipulador.escolha(opcoes)) - 1
-            if idx + 1 == cont + 1:
-                loop = False
+        idx = int(self.manipulador.escolha(opcoes)) - 1
+        if idx + 1 == i + 1:
+            return
 
-            resp = diags[idx]["responses"]
-            # NOTE: sempre pega primeiro resultado
-            resultado = resp[0]["result"]
+        resp = diags[idx]["responses"]
+        # NOTE: SEMPRE PEGA PRIMEIRO RESULTADO
+        resultado = resp[0]["result"]
 
-            active = resultado["active"]
-            if len(active) > 0:
-                self.manipulador.activate_npc(active)
+        active = resultado["active"]
+        if len(active) > 0:
+            self.manipulador.activate_npc(active)
 
-            lose_item = resultado["lose_item"]
-            if len(lose_item) > 0:
-                self.manipulador.perder_item(lose_item)
+        lose_item = resultado["lose_item"]
+        if len(lose_item) > 0:
+            self.manipulador.perder_item(lose_item)
 
     def olhar(self, **kwargs):
         sala = self.manipulador.get_sala()
@@ -245,8 +308,6 @@ class Controller(Machine):
         """
         Recebe alvo e tenta adicionar alvo ao inventario\n
         NOTE: alvo deve ser NOME do objeto\n
-        ------------\n
-        Returns:\n
         """
         # nome do objeto
         nome_item = kwargs.get("alvo", None)
@@ -266,7 +327,7 @@ class Controller(Machine):
             if can_take is False:
                 raise InventoryError("Item nao pode ser pegado")
 
-            resp = self.manipulador.add_inventario(
+            self.manipulador.add_inventario(
                 sala, id_alvo, nome_item, indice_item)
             print(f"Você pegou {nome_item}")
             return True
@@ -296,11 +357,11 @@ class Controller(Machine):
 
             inv = self.manipulador.get_itens()
 
-            instancia_item = {}
+            instancia_item = None
             achou = False
             idx_item = 0
             for i, item in enumerate(inv):
-                nome = item["name"]
+                nome = item.name
                 if nome == nome_item:
                     instancia_item = item
                     idx_item = i
@@ -309,11 +370,11 @@ class Controller(Machine):
 
             if not achou:
                 raise CommandError("Item nao esta no inventario!")
-
-            self.manipulador.soltar_item(instancia_item, idx_item)
-            print(f"Você soltou {nome_item}")
-
-            return True
+            else:
+                if isinstance(instancia_item, Item):
+                    self.manipulador.soltar_item(instancia_item, idx_item)
+                    print(f"Você soltou {nome_item}")
+                    return True
 
         except ProgramError as e:
             print(e.args[0])
@@ -358,7 +419,7 @@ class Controller(Machine):
 
     def mostrarInventario(self, **kwargs):
         itens = self.manipulador.get_itens()
-        itens = [item["name"] for item in itens]
+        itens = [str(item.name) for item in itens]
         if len(itens) == 0:
             print("Invetario vazio")
             return
