@@ -90,12 +90,8 @@ class Controller(Machine):
         end = self.manipulador.contar_turnos()
         if end:
             self.trigger('endgame')
-        if comando != "falar":
 
-            self.trigger(comando, alvo=alvo)
-        else:
-            a = self.trigger("falar", alvo=alvo)
-            print("RETORNO TRIGGER: ", a)
+        self.trigger(comando, alvo=alvo)
 
     def mover(self, **kwargs):
         """
@@ -147,11 +143,12 @@ class Controller(Machine):
         ### Returns:
         """
         nome_npc = kwargs.get("alvo", None)
+        # id_npc = None
         try:
             if nome_npc == None:
                 # deu alguma merda grande
-                raise ProgramError("ERRO NO PROGRAMA! Reinicie", critical=True)
-            print("NOME DE INPUT: ", nome_npc)
+                raise ProgramError(
+                    "ERRO NO PROGRAMA! Reinicie", critical=True)
             sala = self.manipulador.get_sala()
             id_npc, indice_npc = self.manipulador.busca_dupla(
                 sala["npcs"], "id", "name", nome_npc)
@@ -168,8 +165,38 @@ class Controller(Machine):
             print(e.args[0])
             if e.critical == True:
                 exit(1)
+            return
         except CommandError as e:
             print(e.args[0])
+            return
+
+        diags = sala["npcs"][indice_npc]["dialogues"]
+        opcoes = {}
+        cont = 0
+
+        for i in range(1, len(diags) + 1):
+            opcoes[i] = diags[i]["text"]
+            cont += 1
+        opcoes[cont + 1] = "Sair do dialogo"
+
+        loop = True
+        while loop:
+            idx = int(self.manipulador.escolha(opcoes)) - 1
+            if idx + 1 == cont + 1:
+                loop = False
+
+            resp = diags[idx]["responses"]
+            # NOTE: sempre pega primeiro resultado
+            resultado = resp[0]["result"]
+
+            active = resultado["active"]
+            if len(active) > 0:
+                self.manipulador.activate_npc(active)
+
+            lose_item = resultado["lose_item"]
+            if len(lose_item) > 0:
+                # TODO: CRIAR LOGICA DE EXCECOES
+                self.manipulador.perder_item(lose_item)
 
     def olhar(self, **kwargs):
         sala = self.manipulador.get_sala()

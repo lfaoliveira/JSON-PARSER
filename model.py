@@ -20,7 +20,8 @@ class InventoryError(DataError):
 class DataManipulator:
     def __init__(self, path_dataset, filename):
         self.dict_data = self.pegar_JSON(path_dataset, filename)
-        # acoes permitidas ao usuario
+
+        # TODO: criar logica de hashmaps pra todos os npcs de cada sala
 
         # stats do usuario
         self.attack = self.dict_data["attack"]
@@ -56,25 +57,29 @@ class DataManipulator:
         else:
             self.turnos = None
 
+    def activate_npc(self, lista_npc):
+        # TODO: criar logica de ativacao de npc
+        pass
+
     def escolha(self, opcoes: dict[int, str]):
         """
         ### Desc:
         Faz input de escolha
         Estrutura de opcoes: 
         {num1: "nome", num2: "nome2", ...}\n
-        ---------------------------\n
+        ---\n
         ### Parameters:\n
 
-        Sempre retorna 
+        Sempre retorna numero de escolha
         """
         nums = [i + 1 for i in range(len(opcoes.keys()))]
-        a = input(">>> ")
+        a = input("\t) ")
 
         # so aceita ate 9 escolhas
         match = re.match(f'[{nums[0]}-{nums[-1]}]', a)
         while (match == None):
             print("Insira um número válido! ")
-            a = input(">>> ")
+            a = input("\t) ")
             match = re.match(f'[{nums[0]}-{nums[-1]}]', a)
         string = re.split(f"([{nums[0]}-{nums[-1]}])", match.string)[1]
 
@@ -115,6 +120,10 @@ class DataManipulator:
             # dados retornados como dict
             # print(f"JSON: {data}\n\n")
             return data
+
+    def perder_item(self, lista_itens):
+        for elem in lista_itens:
+            self.inv.remove(elem)
 
     def contar_turnos(self):
         """
@@ -190,7 +199,7 @@ class DataManipulator:
         retorna inteiro para erro ou lista contendo comando ou comando e alvo
         """
         # TODO: finalizar atacar
-
+        # acoes permitidas ao usuario
         COMANDOS_1 = ["olhar", "itens", "ajuda"]
         COMANDOS_2 = ["usar", "pegar", "falar",
                       "soltar", "andar", "mover", "atacar"]
