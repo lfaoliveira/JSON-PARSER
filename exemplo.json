@@ -72,7 +72,7 @@
                     "description": "Um enigma complicado",
                     "solution": {
                         "requiredItems": ["item1"],
-                        "actions": [ "usar"]
+                        "actions": ["usar"]
                     },
                     "result": {
                         "active": ["puzzle1"],

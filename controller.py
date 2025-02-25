@@ -92,8 +92,9 @@ class Controller(Machine):
             end = self.manipulador.contar_turnos()
             if end:
                 self.trigger('endgame')
-
         self.trigger(comando, alvo=alvo)
+        if comando in ["usar", "pegar", "soltar", "mover"]:
+            self.manipulador.check_puzzle()
 
     def mover(self, **kwargs):
         """
@@ -117,6 +118,8 @@ class Controller(Machine):
                 # nao achou alvo
                 raise CommandError("Item nao existe!")
             print(f"Você moveu {nome_item}")
+            self.manipulador.reg_acao("mover", id_alvo)
+
             return True
 
         except ProgramError as e:
@@ -176,13 +179,13 @@ class Controller(Machine):
                 self.manipulador, ataque_ini)
             if impossivel_vencer:
                 raise CommandError(
-                    "Inimigo com ataque muito alto! pegue itens melhores")
+                    "Inimigo com ataque muito alto! Pegue itens melhores")
             else:
                 # hora de atacar
                 self.manipulador.life -= ataque_real_ini
                 if def_ini > self.manipulador.attack:
                     raise CommandError(
-                        "Inimigo com defensa muita alta! pegue itens melhores")
+                        "Inimigo com defensa muita alta! Pegue itens melhores")
                 else:
                     # nao morreu com ataque e inimigo pode ser morto
                     print(f"Você eliminou {nome_inimigo}")
@@ -263,6 +266,7 @@ class Controller(Machine):
         sala = self.manipulador.get_sala()
         desc = sala.get("description")
         name = sala.get("name")
+
         itens = sala.get("items")
         npcs = sala.get("npcs")
         enemies = sala.get("enemies")
@@ -330,6 +334,7 @@ class Controller(Machine):
             self.manipulador.add_inventario(
                 sala, id_alvo, nome_item, indice_item)
             print(f"Você pegou {nome_item}")
+            self.manipulador.reg_acao("pegar", id_alvo)
             return True
 
         except ProgramError as e:
@@ -374,6 +379,7 @@ class Controller(Machine):
                 if isinstance(instancia_item, Item):
                     self.manipulador.soltar_item(instancia_item, idx_item)
                     print(f"Você soltou {nome_item}")
+                    self.manipulador.reg_acao("soltar", instancia_item.id)
                     return True
 
         except ProgramError as e:
@@ -408,6 +414,7 @@ class Controller(Machine):
                 raise CommandError("Item nao existe!")
 
             print(f"Você usou {nome_item}")
+            self.manipulador.reg_acao("usar", id_alvo)
             return True
 
         except ProgramError as e:

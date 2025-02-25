@@ -1,6 +1,7 @@
 import os
 import json
 import re
+import copy
 
 ATRIB_PLAYER = ["startLocationId", "attack", "defense", "life"]
 ATRIB_OPCIONAIS = ["max_itens", "max_turns_easy",
@@ -44,7 +45,7 @@ class DataManipulator:
 
         self.puzzles_resolv = []
 
-        # localizacao
+        # localizacao: dict: key=id da sala; value = dict da sala
         self.loc = {}
         aux = self.dict_data.get("locations", [])
         for obj in aux:
@@ -75,13 +76,15 @@ class DataManipulator:
         # itens do usuario
         self.inv = []
         # ATRIBUTOS OPCIONAIS
-        self.max_itens = self.dict_data.get("max_itens", None)
-        self.max_turns_easy = self.dict_data.get("max_turns_easy", None)
-        self.max_turns_normal = self.dict_data.get("max_turns_normal", None)
-        self.max_turns_hard = self.dict_data.get("max_turns_hard", None)
+        self.max_itens = int(self.dict_data.get("max_itens", None)
+                             )
+        self.max_turns_easy = int(self.dict_data.get("max_turns_easy", None))
+        self.max_turns_normal = int(
+            self.dict_data.get("max_turns_normal", None))
+        self.max_turns_hard = int(self.dict_data.get("max_turns_hard", None))
 
         # array contendo acoes executadas na sala atual
-        self.acoes_atuais = []
+        self.acoes_atuais = {}
 
         escolha = self.escolher_dificuldade()
         if escolha != None:
@@ -209,8 +212,39 @@ class DataManipulator:
         """funcao para pegar dados normalmente"""
         return self.dict_data[arg]
 
-    def reg_acao(self, acao):
-        self.acoes_atuais.append(acao)
+    def reg_acao(self, acao: str, alvo: str):
+        self.acoes_atuais[acao] = alvo
+
+    def check_puzzle(self):
+        sala = self.get_sala()
+        lista_puzzles = list(sala["puzzles"])
+
+        for i, puzzle in enumerate(lista_puzzles):
+            sol = puzzle["solution"]
+            lista_comandos = sol["requiredItems"]
+            lista_alvos = sol["actions"]
+            resolveu = False
+
+            for comando, alvo in zip(lista_comandos, lista_alvos):
+                if comando in self.acoes_atuais.keys():
+                    if self.acoes_atuais[comando] == alvo:
+                        resolveu = True
+                    else:
+                        resolveu = False
+                        break
+
+            if resolveu:
+                print("Voce resolveu o quebra-cabeças!")
+                res = puzzle["result"]
+                for id_item in res["lose_item"]:
+                    copia_inv = copy.copy(self.inv)
+                    for inst_item in copia_inv:
+                        if inst_item.id == id_item:
+                            self.inv.remove(inst_item)
+
+                loss = res["lose_life"]
+                self.life -= int(loss)
+                self.puzzles_resolv.append(puzzle["id"])
 
     def proc_result(self, result: dict):
         active = result["active"]
@@ -254,7 +288,7 @@ class DataManipulator:
         Muda de objeto sala
         NOTE: considera id da sala como numerico
         """
-        self.acoes_atuais = []
+        self.acoes_atuais = {}
         self.sala_atual = id_alvo
         return self.get_sala()
 
@@ -287,9 +321,6 @@ class DataManipulator:
         elif tam_seq >= 2:
 
             if comando in COMANDOS_2:
-                # alvo = str(sequencia_str[1])
-                # registra acao
-                self.reg_acao(comando)
                 alvo = "_".join(sequencia_str[1:])
                 return [comando, alvo]
             else:
